@@ -41,14 +41,16 @@ for r in chu_de:
     kn = (r[6] or "").split(",")[0].strip() or None
     out.append("insert into public.chu_de (ma, ten_tre, nhom_mon, tuan, ten_day_du, bloom, ky_nang_chinh, y_tuong_lon) values (%s,%s,%s,%s,%s,%s,%s,%s) on conflict (ma) do update set ten_tre=excluded.ten_tre, nhom_mon=excluded.nhom_mon, tuan=excluded.tuan, ten_day_du=excluded.ten_day_du, bloom=excluded.bloom, ky_nang_chinh=excluded.ky_nang_chinh, y_tuong_lon=excluded.y_tuong_lon;"
                % (q(r[0]), q(r[1]), q(r[2]), int(r[3]) if r[3] else "null", q(r[4]), q(r[5]), q(kn), q((r[7] or "")[:3] or None)))
+# Thông tin công khai của đội ngũ (trang chủ). Email và quyền của các cô nằm ở bảng nhan_su,
+# được ghi thẳng vào cơ sở dữ liệu, KHÔNG đưa vào kho mã công khai này.
 DOI_NGU = [
-    ("co-trang@chua-cap-nhat.invalid", "Cô Trang", "giang_day", "Giảng dạy, thiết kế chương trình, duyệt báo cáo tuần", True, 1),
-    ("co-ngoc@chua-cap-nhat.invalid", "Cô Ngọc", "giao_vu", "Giáo vụ học tập: tương tác, chỉ dẫn và đồng hành cùng các con trong lớp", False, 2),
-    ("co-nguyen@chua-cap-nhat.invalid", "Cô Nguyên", "cham_bai", "Chấm bài, phát hiện điểm hỏng, tạo dữ liệu cho tuần ôn khắc phục", False, 3),
-    ("co-yori@chua-cap-nhat.invalid", "Cô Yori", "coach", "Coach của học sinh và phụ huynh khi có tiến bộ hay hạn chế cần đồng hành", False, 4),
+    ("giang_day", "Cô Trang", "Giảng dạy, thiết kế chương trình, duyệt báo cáo tuần", 1),
+    ("giao_vu", "Cô Ngọc", "Giáo vụ học tập: tương tác, chỉ dẫn và đồng hành cùng các con trong lớp", 2),
+    ("cham_bai", "Cô Nguyên", "Chấm bài, phát hiện điểm hỏng, tạo dữ liệu cho tuần ôn khắc phục", 3),
+    ("coach", "Cô Yori", "Coach của học sinh và phụ huynh khi có tiến bộ hay hạn chế cần đồng hành", 4),
 ]
-for e, t, v, m, qt, tt in DOI_NGU:
-    out.append("insert into public.nhan_su (email, ho_ten, vai, mo_ta_vai, quan_tri, thu_tu) values (%s,%s,%s,%s,%s,%s) on conflict (email) do update set ho_ten=excluded.ho_ten, vai=excluded.vai, mo_ta_vai=excluded.mo_ta_vai, quan_tri=excluded.quan_tri, thu_tu=excluded.thu_tu;" % (q(e), q(t), q(v), q(m), q(qt), tt))
+for v, t, m, tt in DOI_NGU:
+    out.append("insert into public.doi_ngu (vai, ten_goi, mo_ta_vai, thu_tu) values (%s,%s,%s,%s) on conflict (vai) do update set ten_goi=excluded.ten_goi, mo_ta_vai=excluded.mo_ta_vai, thu_tu=excluded.thu_tu;" % (q(v), q(t), q(m), tt))
 out.append("commit;")
 (RA / "01_danh_muc.sql").write_text("\n".join(out), encoding="utf-8")
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { sb } from "../lib/supabase";
-import type { NhanSu } from "../lib/hoSo";
+type ThanhVien = { vai: string; ten_goi: string; mo_ta_vai: string | null; thu_tu: number };
 
 const NHOM = [
   { nhan: "LỚP 3", ten: "Toán tư duy", mo: "Các con làm quen với cách nghĩ có hệ thống: vẽ ra để thấy, chia trường hợp không sót, tìm quy luật trong cái đang đổi." },
@@ -15,8 +15,8 @@ const WEB = [
 ];
 
 export default function TrangChu() {
-  const [doiNgu, setDoiNgu] = useState<NhanSu[]>([]);
-  useEffect(() => { sb.from("nhan_su").select("*").order("thu_tu").then(({ data }) => setDoiNgu((data as NhanSu[]) ?? [])); }, []);
+  const [doiNgu, setDoiNgu] = useState<ThanhVien[]>([]);
+  useEffect(() => { sb.from("doi_ngu").select("vai, ten_goi, mo_ta_vai, thu_tu").order("thu_tu").then(({ data }) => setDoiNgu((data as ThanhVien[]) ?? [])); }, []);
   return (
     <main>
       <section className="anh-hung">
@@ -75,9 +75,9 @@ export default function TrangChu() {
           <p className="dan">Bốn cô cùng nhìn thấy toàn bộ hành trình của con. Mỗi cô giữ một phần việc rõ ràng, để không chỗ nào bị bỏ sót.</p>
           <div className="luoi c4 co">
             {doiNgu.map((c) => (
-              <div className="the" key={c.email}>
-                <div className="vong">{c.ho_ten.replace("Cô ", "").slice(0, 1)}</div>
-                <h3>{c.ho_ten}</h3>
+              <div className="the" key={c.vai}>
+                <div className="vong">{c.ten_goi.replace("Cô ", "").slice(0, 1)}</div>
+                <h3>{c.ten_goi}</h3>
                 <p className="nho">{c.mo_ta_vai}</p>
               </div>
             ))}
