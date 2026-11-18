@@ -1,0 +1,7 @@
+# Cấu hình tối thiểu cho dự án Supabase "tramtuduy".
+# Chỉ khai báo phần đăng nhập; mọi thuộc tính không ghi ở đây được giữ nguyên trên máy chủ.
+project_id = "pqildzyhzpudfkjinhyx"
+
+[auth]
+site_url = "https://tramtuduy.org"
+additional_redirect_urls = ["https://tramtuduy.org/", "https://www.tramtuduy.org/", "http://localhost:5173/", "http://127.0.0.1:5173/"]
