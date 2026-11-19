@@ -44,7 +44,7 @@ function DemNgay() {
 
 const THONG_DIEP = "Các cô cùng ba mẹ nắm lấy tay các con để tiếp sức trên hành trình vun bồi trí tuệ và nội lực.";
 
-// Cảnh chú ong: chèn thẳng SVG vào trang để chữ dùng phông Be Vietnam Pro.
+// Cảnh chú ong: chèn thẳng SVG vào trang để chữ dùng phông của trang (SF Pro hoặc Inter).
 // Điện thoại dùng bố cục dọc; giảm chuyển động dùng bản tĩnh.
 function CanhOng() {
   const ref = useRef<HTMLDivElement>(null);
@@ -104,7 +104,8 @@ export default function TrangChu() {
       <section className="tc-mo" data-sc-act="flow">
         <div className="tc-mo__chu sc-wrap">
           <DemNgay />
-          <h1>Xây nền trí tuệ. <span className="tc-mo__nhat">Toán tư duy, tiếng Anh và luyện thi vào lớp 6 cho các con tiểu học. Từng bước nhỏ, trên một hành trình dài.</span></h1>
+          <h1>Xây nền trí tuệ.</h1>
+          <p className="tc-mo__phu">Toán tư duy, tiếng Anh và luyện thi vào lớp 6 cho các con tiểu học. <span>Từng bước nhỏ, trên một hành trình dài.</span></p>
           <div className="tc-mo__nut">
             <Link to="/ho-so-mau" className="tc-nut tc-nut--chinh">Xem hồ sơ mẫu</Link>
             <Link to="/dang-nhap" className="tc-nut tc-nut--phu">Đăng nhập</Link>

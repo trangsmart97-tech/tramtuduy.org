@@ -4,7 +4,7 @@ Chạy: python3 cong-cu/tao_canh_ong.py
 Ra (web/public/hinh/):
   canh-ong.svg, canh-ong-tinh.svg          bố cục ngang (máy tính)
   canh-ong-doc.svg, canh-ong-doc-tinh.svg  bố cục dọc (điện thoại)
-Các tệp được chèn thẳng vào trang (không qua <img>) để chữ dùng phông Be Vietnam Pro của trang.
+Các tệp được chèn thẳng vào trang (không qua <img>) để chữ dùng phông của trang: SF Pro trên iPhone, Mac; Inter trên máy khác.
 Mọi lớp, mã và hoạt ảnh đều có tiền tố “o-” để không đụng CSS của trang.
 
 Câu chuyện, một vòng:
@@ -24,9 +24,9 @@ THONG_DIEP = {
     "trai": ["Các cô cùng ba mẹ", "nắm lấy tay các con", "để tiếp sức"],
     "phai": ["trên hành trình", "vun bồi trí tuệ", "và nội lực."],
 }
-# Độ rộng đo bằng canvas với phông Be Vietnam Pro 600, cỡ 23px (đo trên trang thật).
-RONG_23 = {"Các cô cùng ba mẹ": 219.5, "nắm lấy tay các con": 230.3, "để tiếp sức": 126.4,
-           "trên hành trình": 167.5, "vun bồi trí tuệ": 157.4, "và nội lực.": 115.8}
+# Độ rộng ở cỡ 23px, nét 600, đo trên trang thật; lấy số lớn hơn giữa SF Pro (iPhone, Mac) và Inter (máy khác).
+RONG_23 = {"Các cô cùng ba mẹ": 202.7, "nắm lấy tay các con": 211.4, "để tiếp sức": 114.3,
+           "trên hành trình": 157.7, "vun bồi trí tuệ": 144.9, "và nội lực.": 107.1}
 
 BO_CUC = {
     "ngang": dict(W=1200, H=660, CAY_W=360, TW=320, TH=280, CO=26, GIAN=50,
@@ -131,7 +131,7 @@ def tao(ten_bo, TINH):
     @keyframes o-vo { from { transform: scaleY(1); } to { transform: scaleY(0.45); } }
     .o-than { animation: o-nhun 0.6s ease-in-out infinite alternate; }
     @keyframes o-nhun { from { transform: translateY(0); } to { transform: translateY(-4px); } }
-    .o-chu { font-family: "Be Vietnam Pro", system-ui, sans-serif; font-weight: 600; fill: #463665; }
+    .o-chu { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-weight: 600; fill: #463665; }
     """ + ("" if not TINH else ".o-canh, .o-than { animation: none; }")
 
     svg = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" aria-hidden="true" focusable="false">',

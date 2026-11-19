@@ -5,19 +5,19 @@
 <linearGradient id="o-vang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE28A"/><stop offset=".55" stop-color="#F6C453"/><stop offset="1" stop-color="#E3A92B"/></linearGradient>
 <filter id="o-bong" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#2d5a46" flood-opacity=".14"/></filter>
 <filter id="o-hao" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="m"/><feMerge><feMergeNode in="m"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<clipPath id="o-k-trai-0"><rect x="-124.2" y="-77.2" height="43.2" width="237"></rect></clipPath>
-<clipPath id="o-k-trai-1"><rect x="-124.2" y="-31.2" height="43.2" width="248.3"></rect></clipPath>
-<clipPath id="o-k-trai-2"><rect x="-124.2" y="14.8" height="43.2" width="139.9"></rect></clipPath>
-<clipPath id="o-k-phai-0"><rect x="-124.2" y="-77.2" height="43.2" width="182.8"></rect></clipPath>
-<clipPath id="o-k-phai-1"><rect x="-124.2" y="-31.2" height="43.2" width="172.2"></rect></clipPath>
-<clipPath id="o-k-phai-2"><rect x="-124.2" y="14.8" height="43.2" width="128.8"></rect></clipPath>
+<clipPath id="o-k-trai-0"><rect x="-114.3" y="-77.2" height="43.2" width="219.5"></rect></clipPath>
+<clipPath id="o-k-trai-1"><rect x="-114.3" y="-31.2" height="43.2" width="228.6"></rect></clipPath>
+<clipPath id="o-k-trai-2"><rect x="-114.3" y="14.8" height="43.2" width="127.3"></rect></clipPath>
+<clipPath id="o-k-phai-0"><rect x="-114.3" y="-77.2" height="43.2" width="172.6"></rect></clipPath>
+<clipPath id="o-k-phai-1"><rect x="-114.3" y="-31.2" height="43.2" width="159.2"></rect></clipPath>
+<clipPath id="o-k-phai-2"><rect x="-114.3" y="14.8" height="43.2" width="119.8"></rect></clipPath>
 </defs>
 <style>
     .o-canh { transform-box: fill-box; transform-origin: 50% 100%; animation: o-vo 0.11s ease-in-out infinite alternate; }
     @keyframes o-vo { from { transform: scaleY(1); } to { transform: scaleY(0.45); } }
     .o-than { animation: o-nhun 0.6s ease-in-out infinite alternate; }
     @keyframes o-nhun { from { transform: translateY(0); } to { transform: translateY(-4px); } }
-    .o-chu { font-family: "Be Vietnam Pro", system-ui, sans-serif; font-weight: 600; fill: #463665; }
+    .o-chu { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-weight: 600; fill: #463665; }
     .o-canh, .o-than { animation: none; }</style>
 <ellipse cx="321.7" cy="581.4" rx="220" ry="200" fill="url(#o-gn)" opacity=".45"/>
 <ellipse cx="321.7" cy="848.5" rx="192" ry="46" fill="url(#o-gm)" opacity=".35"/>
@@ -29,9 +29,9 @@
 <line x1="-128" x2="128" y1="55" y2="55" stroke="#eadfce" stroke-width="1.4"/>
 <line x1="-128" x2="128" y1="101" y2="101" stroke="#eadfce" stroke-width="1.4"/>
 <g class="o-chu" font-size="24">
-<text x="-120.2" y="-46" clip-path="url(#o-k-trai-0)">Các cô cùng ba mẹ</text>
-<text x="-120.2" y="0" clip-path="url(#o-k-trai-1)">nắm lấy tay các con</text>
-<text x="-120.2" y="46" clip-path="url(#o-k-trai-2)">để tiếp sức</text>
+<text x="-110.3" y="-46" clip-path="url(#o-k-trai-0)">Các cô cùng ba mẹ</text>
+<text x="-110.3" y="0" clip-path="url(#o-k-trai-1)">nắm lấy tay các con</text>
+<text x="-110.3" y="46" clip-path="url(#o-k-trai-2)">để tiếp sức</text>
 </g></g>
 <g transform="translate(482 200) rotate(4)" filter="url(#o-bong)">
 <rect x="-146.0" y="-125.0" width="292" height="250" rx="16" fill="#fffaf2"/>
@@ -41,9 +41,9 @@
 <line x1="-128" x2="128" y1="55" y2="55" stroke="#eadfce" stroke-width="1.4"/>
 <line x1="-128" x2="128" y1="101" y2="101" stroke="#eadfce" stroke-width="1.4"/>
 <g class="o-chu" font-size="24">
-<text x="-120.2" y="-46" clip-path="url(#o-k-phai-0)">trên hành trình</text>
-<text x="-120.2" y="0" clip-path="url(#o-k-phai-1)">vun bồi trí tuệ</text>
-<text x="-120.2" y="46" clip-path="url(#o-k-phai-2)">và nội lực.</text>
+<text x="-110.3" y="-46" clip-path="url(#o-k-phai-0)">trên hành trình</text>
+<text x="-110.3" y="0" clip-path="url(#o-k-phai-1)">vun bồi trí tuệ</text>
+<text x="-110.3" y="46" clip-path="url(#o-k-phai-2)">và nội lực.</text>
 </g></g>
 <g transform="translate(120 438.7) scale(0.24510) translate(-177 -18)"><g transform="translate(0.000000,1815.000000) scale(0.100000,-0.100000)" fill="#D2A06C">
 <path d="M4345 6826 c-207 -20 -408 -54 -425 -73 -4 -4 -48 -109 -98 -233 -50
