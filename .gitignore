@@ -5,3 +5,7 @@ web/dist/
 .env.*
 supabase/.temp/
 supabase/.branches/
+scrollcraft/node_modules/
+scrollcraft/package.json
+scrollcraft/package-lock.json
+scrollcraft/builds/*/lab/
