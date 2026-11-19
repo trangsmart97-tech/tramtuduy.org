@@ -26,6 +26,29 @@ function CayTriTue({ dung }: { dung?: boolean }) {
   );
 }
 
+const THONG_DIEP = "Các cô cùng ba mẹ nắm lấy tay các con để tiếp sức trên hành trình vun bồi trí tuệ và nội lực.";
+
+// Cảnh chú ong: chèn thẳng SVG vào trang để chữ dùng phông Be Vietnam Pro.
+// Điện thoại dùng bố cục dọc; giảm chuyển động dùng bản tĩnh.
+function CanhOng() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const hep = matchMedia("(max-width: 760px)");
+    const giam = matchMedia("(prefers-reduced-motion: reduce)");
+    let huy = false;
+    const nap = () => {
+      const ten = "canh-ong" + (hep.matches ? "-doc" : "") + (giam.matches ? "-tinh" : "") + ".svg";
+      fetch("/hinh/" + ten).then((r) => r.text()).then((svg) => {
+        if (!huy && ref.current && svg.startsWith("<svg")) ref.current.innerHTML = svg;
+      }).catch(() => {});
+    };
+    nap();
+    hep.addEventListener("change", nap); giam.addEventListener("change", nap);
+    return () => { huy = true; hep.removeEventListener("change", nap); giam.removeEventListener("change", nap); };
+  }, []);
+  return <div className="tc-mo__ong" data-sc-parallax="0.45" role="img" aria-label={"Chú ong viết lên hai trang giấy: “" + THONG_DIEP + "” Chữ hoá giọt mật nuôi rễ, dòng mật dâng lên làm bộ não trên tán cây bừng sáng."} ref={ref} />;
+}
+
 const CHANG = [
   { ngay: "09/12/2026", ten: "Đầu vào", mo: "Một đề mô phỏng đúng cấu trúc đề 2026, thi trên máy. Kết quả chia theo năm nhóm môn." },
   { ngay: "14/12 đến 31/01", ten: "Xây nền", mo: "Tuần 1 đến tuần 7. Bài kiểm tra Mốc 1 ngày 09/01, Mốc 2 ngày 30/01." },
@@ -70,15 +93,14 @@ export default function TrangChu() {
             <Link to="/dang-nhap" className="tc-nut tc-nut--phu">Đăng nhập</Link>
           </div>
         </div>
-        <div className="tc-mo__canh" aria-hidden="true">
-          <div className="tc-hao" data-sc-parallax="1.3" />
-          <div className="tc-bui" data-sc-parallax="0.7">
+        <div className="tc-mo__canh">
+          <div className="tc-hao" data-sc-parallax="1.3" aria-hidden="true" />
+          <div className="tc-bui" data-sc-parallax="0.7" aria-hidden="true">
             <i style={{ left: "31%", top: "38%" }} /><i style={{ left: "66%", top: "30%" }} /><i style={{ left: "24%", top: "62%" }} />
             <i style={{ left: "73%", top: "56%" }} /><i style={{ left: "40%", top: "22%" }} /><i style={{ left: "58%", top: "70%" }} />
           </div>
-          <div className="tc-mo__cay" data-sc-parallax="0.45"><CayTriTue /></div>
-          <div className="tc-giay tc-giay--trai" data-sc-parallax="-1.6" />
-          <div className="tc-giay tc-giay--phai" data-sc-parallax="-1.1" />
+          {/* Chú ong viết thông điệp trên hai trang; chữ hoá giọt mật nuôi rễ; dòng mật dâng lên, bộ não bừng sáng (cong-cu/tao_canh_ong.py) */}
+          <CanhOng />
         </div>
         <div className="tc-mo__ha" />
       </section>
