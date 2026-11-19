@@ -118,11 +118,28 @@ await mot(`update public.de_thi set dong = now() - interval '3 minute', mo = now
 await vaiKhach();
 r = await goi("ld_ket_qua", MA, "de-mau"); kiem(r.kq && r.kq.chiTiet && r.kq.chiTiet.tn2.dung === false && r.kq.chiTiet.tn2.dapAn === 2, "hết giờ thì mở đáp án", r);
 const deKq = r.kq && r.kq.de;
-kiem(deKq && deKq.phan.length === 2 && deKq.phan.every(p => p.muc.every(m => m.loai !== "doan")) && deKq.phan[1].muc.length === 4 && !JSON.stringify(deKq).includes("Library notice"),
-  "đề gửi kèm kết quả không còn khối bài đọc", deKq && deKq.phan.map(p => p.muc.map(m => m.loai)));
+kiem(deKq && deKq.phan.length === 2 && deKq.phan[1].muc.length === 5 && deKq.phan[1].muc[0].loai === "doan" && JSON.stringify(deKq).includes("school library opens"),
+  "đề gửi kèm kết quả còn bài đọc không đánh dấu (để con đọc lại khi xem lời giải)", deKq && deKq.phan.map(p => p.muc.map(m => m.loai)));
+{
+  const deAn = { ma: "x", tieuDe: "x", phan: [{ ten: "P", phut: 5, muc: [
+    { loai: "doan", tieuDe: "Rùa biển", noiDung: "Bài đọc rùa biển", audio: "nghe.mp3", soLanNghe: 2 },
+    { loai: "doan", tieuDe: "Trên gác xép", noiDung: "BÀI THƠ KÍN", anSauThi: true },
+    { loai: "doan", tieuDe: "Thơ hai", noiDung: "BÀI THƠ KÍN HAI", anSauKetQua: true },
+    { loai: "chon", id: "c1", cau: "?", luaChon: ["a", "b"] }] }] };
+  await vaiGoc();
+  const k = (await mot(`select noi_bo.ld_de_khong_doan($1) k`, [deAn]))[0].k;
+  const s = JSON.stringify(k);
+  kiem(k.phan[0].muc.length === 2 && s.includes("Bài đọc rùa biển") && !s.includes("BÀI THƠ KÍN") && !s.includes("nghe.mp3") && !s.includes("soLanNghe"),
+    "chỉ bỏ khối anSauThi/anSauKetQua; khối còn lại không kèm bản ghi nghe", k.phan[0].muc);
+  const loiMoi2 = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ phan: [{ ten: "P1", phut: 5, dongLuc: "20:15", muc: [{ loai: "doan", tieuDe: "T", anSauThi: "co" }] }] }, { cau: {} }])).map(r => r.l);
+  kiem(loiMoi2.length === 2 && loiMoi2.some(l => l.includes("dongLuc")) && loiMoi2.some(l => l.includes("anSauThi")), "kiểm đề bắt dongLuc sai dạng và anSauThi không phải true/false", loiMoi2);
+  const loiDung = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ phan: [{ ten: "P1", phut: 5, dongLuc: "2026-12-09T20:15:00+07:00", muc: [{ loai: "doan", tieuDe: "T", anSauThi: true }] }] }, { cau: {} }])).map(r => r.l);
+  kiem(loiDung.length === 0, "dongLuc và anSauThi đúng dạng thì không lỗi", loiDung);
+  await vaiKhach();
+}
 r = await goi("ld_bat_dau", "thu0chi000000000000000000004", "de-mau", "1234"); kiem(/hết giờ/.test(r.loi || ""), "lượt mới sau giờ đóng bị chặn", r);
 r = await goi("ld_bat_dau", maBinh, "de-mau", "1234");
-kiem(r.kq && r.kq.hetGio === true && r.kq.daNop === true && r.kq.diemMay === 4 && !JSON.stringify(r.kq).includes("noiDung"), "Bình mở lại sau giờ đóng: máy nộp với phần đã lưu (4 điểm), không phát lại đề", r.kq && { hetGio: r.kq.hetGio, diem: r.kq.diemMay });
+kiem(r.kq && r.kq.hetGio === true && r.kq.daNop === true && r.kq.diemMay === 4 && !("batDauPhan" in r.kq) && !("traLoi" in r.kq) && !JSON.stringify(r.kq).includes("audio"), "Bình mở lại sau giờ đóng: máy nộp với phần đã lưu (4 điểm), không phát lại đề", r.kq && { hetGio: r.kq.hetGio, diem: r.kq.diemMay });
 await vaiGoc();
 kiem((await mot(`select nop_muon from public.luot_thi where hoc_sinh_id=$1`, [hsBinh]))[0].nop_muon === true, "bài của Bình ghi nộp muộn");
 
@@ -215,7 +232,9 @@ kiem(await cc("Mai’s father drives") === "mai's father drives", "giữ nháy t
 const fAnh = path.join(DA, "03 TIẾNG ANH/NHÁP/tang3-tuan-1-tieng-anh-1.dapan.json");
 if (fAnh && fs.existsSync(fAnh)) {
   const daAnh = JSON.parse(fs.readFileSync(fAnh, "utf8"));
-  const thuCau = { t6: "mai's father usually drives to work but today he is taking the bus", t7: "LOOK! The girls are wearing helmets and riding their bikes slowly" };
+  // Lấy câu được chấp nhận đầu tiên trong tệp hiện tại, rồi viết khác đi: chữ thường, bỏ dấu phẩy, “Look,” thành “LOOK!”.
+  const bienThe = (c) => c.replace(/^Look,/, "LOOK!").replace(/,/g, "").replace(/\.$/, "").replace(/^[^L]/, (x) => x.toLowerCase());
+  const thuCau = { t6: bienThe(daAnh.cau.t6.chapNhan[0]).toLowerCase(), t7: bienThe(daAnh.cau.t7.chapNhan[0]) };
   const kA = await cham({ cau: { t6: daAnh.cau.t6, t7: daAnh.cau.t7 } }, thuCau);
   kiem(kA.chiTiet.t6.dung === true && kA.chiTiet.t7.dung === true, "t6, t7 Tiếng Anh: viết thường, không phẩy, “Look!” vẫn đúng", kA.chiTiet);
   const kB = await cham({ cau: { t6: daAnh.cau.t6 } }, { t6: "Mai's father usually drive to work, but today he take the bus." });

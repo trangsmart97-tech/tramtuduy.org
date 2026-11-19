@@ -51,6 +51,17 @@ if (de.xaoPhuongAn && ["dau_vao", "moc", "thuc_chien"].includes(loai) && !thamSo
 const doTinCay = Number(thamSo["do-tin-cay"] || (loai === "tang3" ? 2 : 1));
 const tuan = thamSo.tuan !== undefined ? Number(thamSo.tuan) : (Number((ma.match(/tuan-(\d+)/) || [])[1]) || null);
 
+// Bài đọc hiện lại sau giờ thi: với đề có giám sát, người đăng phải xem danh sách và ghi --da-xem-bai-doc mới đăng được,
+// vì bài đọc có thể là tác phẩm chưa có quyền đăng (tầng 5 lần 3, đề đầu vào, việc 11).
+{
+  const hienLai = de.phan.flatMap((p) => p.muc.filter((m) => m.loai === "doan" && m.anSauThi !== true && m.anSauKetQua !== true));
+  if (hienLai.length && ["dau_vao", "moc", "thuc_chien"].includes(loai) && !thamSo["da-xem-bai-doc"]) {
+    console.error("Các bài đọc sau sẽ HIỆN LẠI ở màn hình kết quả sau giờ thi:");
+    hienLai.forEach((m) => console.error(`  - “${(m.tieuDe || "không tên").slice(0, 80)}”`));
+    dung(`bài nào chưa có quyền đăng thì nhờ người soạn ghi "anSauThi": true ở khối ấy. Đã xem và đúng thì chạy lại kèm --da-xem-bai-doc.`);
+  }
+}
+
 // 2. Kiểm đề trên Postgres cục bộ
 const db = new PGlite({ extensions: { pgcrypto } });
 await db.exec(`create role anon nologin; create role authenticated nologin; create schema auth;
@@ -116,6 +127,12 @@ console.log(`Đề “${daDang.ten}” (mã ${ma}) đạt kiểm.`);
 console.log(`  ${de.phan.length} phần, ${soCau} câu, ${tongPhut} phút; loại ${loai}, độ tin cậy ${doTinCay}${tuan !== null ? ", tuần " + tuan : ""}.`);
 console.log(`  Mở ${mo}, đóng ${dong}${thamSo["ma-phong"] && thamSo["ma-phong"] !== true ? ", có mã phòng thi" : ", không mã phòng thi"}.`);
 console.log(`  ${daDang.tep} tệp hình và bản ghi, tổng ${Math.round(tep.reduce((s, t) => s + t.co, 0) / 1024)} KB.`);
+const dsDoan = de.phan.flatMap((p) => p.muc.filter((m) => m.loai === "doan"));
+const ten = (m) => `“${(m.tieuDe || "không tên").slice(0, 60)}”`;
+const an = dsDoan.filter((m) => m.anSauThi === true || m.anSauKetQua === true), hien = dsDoan.filter((m) => !an.includes(m));
+console.log(`  Bài đọc HIỆN LẠI ở màn hình kết quả sau giờ thi: ${hien.map(ten).join(", ") || "không có"}.`);
+console.log(`  Bài đọc ẨN sau giờ thi (anSauThi): ${an.map(ten).join(", ") || "không có"}.`);
+if (hien.length) console.log(`  → Bài nào chưa có quyền đăng mà nằm ở dòng “HIỆN LẠI” thì dừng, nhờ người soạn ghi "anSauThi": true.`);
 console.log(`  Đã chạy thử tệp SQL trên Postgres cục bộ: được.`);
 console.log(`\nTệp SQL: ${tepRa}`);
 console.log(`Đưa lên thật (chỉ khi cô Trang đã cho phép), từ thư mục cong-tramtuduy:`);

@@ -20,6 +20,8 @@ const de = doc(tepDe), da = doc(tepDa);
 if (process.env.XAO || process.argv[8] === "xao") de.xaoPhuongAn = true;
 const nhan = { "Toán": "TO04", "Tiếng Anh": "TA03", "Tiếng Việt": "TV02", "Khoa học": "KH01", "Lịch sử và Địa lý": "LS03" };
 for (const k of Object.values(da.cau)) { k.chuDe = k.chuDe || nhan[k.nhom]; k.kyNang = k.kyNang || "KN01"; k.bloom = k.bloom || "Hiểu"; }
+// Đối số 10 (tuỳ chọn): số phút nữa thì Phần 1 đóng chung cho mọi bạn (thử "dongLuc").
+if (process.argv[10]) de.phan[0].dongLuc = new Date(Date.now() + Number(process.argv[10]) * 60000).toISOString();
 if (process.argv[7] && de.phan[1]) de.phan[1].moLuc = new Date(Date.now() + Number(process.argv[7]) * 60000).toISOString();
 const maDe = /^[a-z0-9-]+$/.test(de.ma || "") ? de.ma : "de-mau";
 await db.query(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, ma_phong, noi_dung) values ($4,$1,'dau_vao', now() - interval '5 min', now() + make_interval(mins => $3), '1234', $2)`, [de.tieuDe, de, Number(process.argv[9] || process.env.PHUT_DONG || 120), maDe]);
