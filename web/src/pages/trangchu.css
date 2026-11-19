@@ -1,7 +1,12 @@
 /* Trang chủ tramtuduy.org: bố cục kiểu Apple, chuyển động bằng scroll-craft.
    Không sửa lớp .sc-* hay [data-sc-*]: đó là cơ chế của động cơ. */
 
-.tc { --tc-r: 28px; color: var(--chu); }
+.tc { --tc-r: 28px; --vach: rgba(140, 128, 180, 0.14); position: relative; color: var(--chu); }
+
+/* Đường lưới mảnh dọc trang: bốn cột như khung một hệ thống */
+.tc-luoi { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.tc-luoi div { height: 100%; width: min(var(--rong), calc(100% - 2 * var(--sc-gutter))); margin-inline: auto; border-right: 1px solid var(--vach);
+  background: repeating-linear-gradient(to right, var(--vach) 0 1px, transparent 1px 25%); }
 .tc h1, .tc h2, .tc h3 { color: var(--tim); font-family: var(--sc-font-display); font-weight: 700; }
 .tc .sc-body { color: var(--chu-phu); font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.25rem); }
 .tc-nho { font-size: 0.95rem; color: var(--chu-phu); }
@@ -19,7 +24,11 @@
 /* ===== Chặng 1: mở đầu nhiều lớp ===== */
 .tc-mo { position: relative; min-height: calc(100svh - 56px); overflow: clip; display: grid; grid-template-rows: auto 1fr; padding-top: clamp(3.5rem, 9vh, 6.5rem); }
 .tc-mo__chu { position: relative; z-index: 3; text-align: center; }
-.tc-mo__chu h1 { font-size: clamp(3.2rem, 1.6rem + 6.4vw, 7.2rem); line-height: 0.98; letter-spacing: -0.035em; margin: 0; text-wrap: balance; }
+.tc-mo__chu h1 { font-size: clamp(2.1rem, 1rem + 2.6vw, 3.6rem); line-height: 1.1; letter-spacing: -0.028em; margin: 0 auto; max-width: 19em; text-wrap: balance; }
+.tc-mo__nhat { color: #6E6487; font-weight: 600; }
+/* Đồng hồ đếm ngược tới ngày thi, nhảy từng giây */
+.tc-dem-nguoc { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; margin: 0 auto 22px; padding: 7px 18px; border-radius: 999px; border: 1px solid rgba(70, 54, 101, 0.14); background: rgba(255, 255, 255, 0.62); font-size: 0.92rem; color: var(--chu-phu); }
+.tc-dem-nguoc b { color: var(--tim); font-weight: 700; font-variant-numeric: tabular-nums; }
 .tc-mo__chu .sc-body { margin: 18px auto 0; max-width: 34ch; }
 .tc-mo__nut { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
 .tc-mo__canh { position: relative; z-index: 1; display: grid; place-items: end center; min-height: 0; }
@@ -27,7 +36,7 @@
 .tc-bui { position: absolute; inset: 0; pointer-events: none; }
 .tc-bui i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--tim-nhat); opacity: 0.35; }
 .tc-mo__ong svg { width: 100%; height: 100%; max-width: none; overflow: visible; }
-.tc-mo__ong { position: relative; display: block; width: min(96vw, calc(max(100svh - 30rem, 46svh) * 1200 / 660), 1180px); margin-bottom: 1vh; height: auto; max-width: none; aspect-ratio: 1200 / 660; }
+.tc-mo__ong { position: relative; display: block; width: min(96vw, calc(max(100svh - 31rem, 44svh) * 1200 / 660), 1180px); margin-bottom: 1vh; height: auto; max-width: none; aspect-ratio: 1200 / 660; }
 .tc-mo__cay img, .tc-cay img, .tc-ket__cay img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
 
 /* ===== Chặng 2: cây lớn lên (đỉnh) ===== */
@@ -50,6 +59,24 @@
 .tc-muc__dau h2 { font-size: clamp(2.3rem, 1.4rem + 3vw, 4rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 14px; text-wrap: balance; }
 .tc-o-luoi { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-rows: auto auto; gap: 18px; }
 .tc-o { position: relative; border-radius: var(--tc-r); padding: clamp(1.6rem, 3vw, 2.6rem); background: #f3f7f5; overflow: hidden; min-height: 260px; display: flex; flex-direction: column; }
+.tc-o--bon { background: linear-gradient(140deg, #F1ECFF 0%, #E6F5EF 100%); }
+.tc-o--ba { background: linear-gradient(140deg, #FFF3E3 0%, #F1ECFF 100%); }
+/* Giao diện thật bên trong thẻ */
+.tc-mau { position: relative; z-index: 1; margin-top: 22px; max-width: 360px; background: #fff; border: 1px solid #e6e1ef; border-radius: 16px; padding: 14px 16px; box-shadow: 0 14px 34px rgba(46, 32, 90, 0.1), 0 2px 6px rgba(46, 32, 90, 0.06); color: var(--chu); font-size: 0.95rem; }
+.tc-mau__cau { margin: 0 0 10px; font-weight: 600; color: var(--tim); }
+.tc-mau__cau u { text-decoration: none; display: inline-block; min-width: 2.6em; border-bottom: 2px solid var(--tim-nhat); text-align: center; color: #6a58a8; }
+.tc-mau__chon, .tc-mau__day { display: flex; gap: 8px; flex-wrap: wrap; }
+.tc-mau__chon span, .tc-mau__day span { padding: 6px 12px; border-radius: 10px; border: 1px solid #e3dfeb; background: #faf9fc; font-weight: 600; color: var(--chu-phu); font-variant-numeric: tabular-nums; }
+.tc-mau .dung { border-color: #2e8b57; background: #eaf7f1; color: #1f6b43; }
+.tc-mau__goi { margin: 10px 0 0; font-size: 0.88rem; color: var(--chu-mo); }
+.tc-mau__dau { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--tim); margin-bottom: 10px; }
+.tc-mau__dau b { color: var(--dat); font-variant-numeric: tabular-nums; }
+.tc-mau__o { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.tc-mau__o i { aspect-ratio: 1; border-radius: 6px; background: #f1eef7; border: 1px solid #e3dfeb; }
+.tc-mau__o i.xong { background: #8b77c2; border-color: #8b77c2; }
+.tc-mau__o i.dang { background: #fff; border: 2px solid #463665; }
+.tc-mau__thanh { height: 6px; border-radius: 3px; background: #efedf3; margin-top: 12px; overflow: hidden; }
+.tc-mau__thanh span { display: block; height: 100%; background: #463665; border-radius: 3px; }
 .tc-o--lon { grid-row: span 2; background: #463665; color: #fff; min-height: 560px; }
 .tc-o--lon h3, .tc-o--lon .tc-o__nhan { color: #fff; }
 .tc-o--lon .tc-o__mo { color: #e4ddf3; }
@@ -70,9 +97,10 @@
 .tc-khung__thanh i { width: 11px; height: 11px; border-radius: 50%; background: #d9d4e4; display: inline-block; }
 .tc-khung__thanh span { margin-left: 12px; }
 .tc-khung img { width: 100%; height: auto; display: block; }
-.tc-so { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; max-width: 1080px; margin: clamp(2.5rem, 5vw, 4rem) auto 0; }
-.tc-so div { border-top: 1px solid #ddd6e8; padding-top: 16px; }
-.tc-so b { display: block; font-size: clamp(2.4rem, 1.6rem + 2.4vw, 3.8rem); line-height: 1; color: var(--tim); letter-spacing: -0.03em; }
+.tc-so { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 1080px; margin: clamp(2.5rem, 5vw, 4rem) auto 0; }
+.tc-so div { border-left: 1px solid #ddd6e8; padding: 4px clamp(14px, 2vw, 26px) 6px; }
+.tc-so div:first-child { border-left: 0; padding-left: 0; }
+.tc-so b { display: block; font-size: clamp(2.6rem, 1.7rem + 2.8vw, 4.4rem); font-weight: 400; line-height: 1; color: var(--tim); letter-spacing: -0.045em; font-variant-numeric: tabular-nums; }
 .tc-so span { display: block; margin-top: 8px; color: var(--chu-phu); font-size: 0.98rem; max-width: 22ch; }
 
 /* ===== Chặng 5: lộ trình trượt ngang ===== */
@@ -113,6 +141,7 @@
 .tc-lon__dem .tc-lon__buoc, .tc-dem .tc-co .tc-co__vai { color: #F4C96E; }
 .tc-dem .tc-so b, .tc-dem .tc-lien-ket { color: #FFE08A; }
 .tc-dem .tc-co > div { border-top-color: rgba(255, 249, 240, 0.18); }
+.tc-dem .tc-so div { border-color: rgba(255, 249, 240, 0.2); }
 .tc-dem .tc-o { box-shadow: 0 24px 70px rgba(10, 8, 32, 0.45); }
 .tc-dem .tc-o--lon { box-shadow: 0 0 0 1px rgba(255, 249, 240, 0.16), 0 30px 90px rgba(139, 119, 194, 0.4); }
 .tc-dem .tc-khung { border-color: rgba(255, 249, 240, 0.2); box-shadow: 0 30px 100px rgba(139, 119, 194, 0.38), 0 4px 14px rgba(0, 0, 0, 0.3); }
@@ -123,7 +152,6 @@
 /* ===== Điện thoại ===== */
 @media (max-width: 760px) {
   .tc-mo { padding-top: 2.5rem; }
-  .tc-mo__chu h1 { font-size: clamp(2.6rem, 11vw, 3.4rem); }
   .tc-mo { min-height: 0; padding-bottom: 6vh; }
   .tc-mo__canh { place-items: start center; margin-top: 5vh; }
   .tc-mo__ong { width: min(100vw, 520px); aspect-ratio: 640 / 880; margin-inline: auto; }
@@ -133,7 +161,11 @@
   .tc-cay { width: min(56vh, 86vw); }
   .tc-o-luoi { grid-template-columns: 1fr; }
   .tc-o--lon { grid-row: auto; min-height: 420px; }
-  .tc-so { grid-template-columns: 1fr 1fr; }
+  .tc-so { grid-template-columns: 1fr 1fr; row-gap: 22px; }
+  .tc-so div:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .tc-mo__chu h1 { font-size: clamp(1.9rem, 7.6vw, 2.5rem); }
+  .tc-dem-nguoc { font-size: 0.85rem; padding: 6px 14px; }
+  .tc-luoi div { background: linear-gradient(var(--vach), var(--vach)) center / 1px 100% no-repeat; border-left: 1px solid var(--vach); }
   .tc-co { grid-template-columns: 1fr; }
   .tc-chang { flex-basis: 78vw; min-height: 19rem; }
 }

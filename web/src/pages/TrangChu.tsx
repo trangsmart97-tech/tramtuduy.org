@@ -26,6 +26,22 @@ function CayTriTue({ dung }: { dung?: boolean }) {
   );
 }
 
+// Ngày khảo sát vào lớp 6 dự kiến (chờ Sở Giáo dục và Đào tạo công bố), giờ Việt Nam.
+const NGAY_THI = new Date("2027-07-01T00:00:00+07:00").getTime();
+const hai = (n: number) => String(n).padStart(2, "0");
+function DemNgay() {
+  const [bay, setBay] = useState(() => Date.now());
+  useEffect(() => { const id = setInterval(() => setBay(Date.now()), 1000); return () => clearInterval(id); }, []);
+  const con = Math.max(0, Math.floor((NGAY_THI - bay) / 1000));
+  const ngay = Math.floor(con / 86400), gio = Math.floor((con % 86400) / 3600), phut = Math.floor((con % 3600) / 60), giay = con % 60;
+  return (
+    <p className="tc-dem-nguoc" role="timer" aria-live="off">
+      <span>Ngày thi vào lớp 6 dự kiến 01/07/2027, còn</span>
+      <b>{ngay} ngày {hai(gio)}:{hai(phut)}:{hai(giay)}</b>
+    </p>
+  );
+}
+
 const THONG_DIEP = "Các cô cùng ba mẹ nắm lấy tay các con để tiếp sức trên hành trình vun bồi trí tuệ và nội lực.";
 
 // Cảnh chú ong: chèn thẳng SVG vào trang để chữ dùng phông Be Vietnam Pro.
@@ -83,11 +99,12 @@ export default function TrangChu() {
 
   return (
     <div className="tc" ref={goc}>
+      <div className="tc-luoi" aria-hidden="true"><div /></div>
       {/* 1. Mở đầu: nhiều lớp trôi ở nhịp khác nhau */}
       <section className="tc-mo" data-sc-act="flow">
         <div className="tc-mo__chu sc-wrap">
-          <h1>Xây nền trí tuệ.</h1>
-          <p className="sc-body">Toán tư duy, tiếng Anh và luyện thi vào lớp 6 cho các con tiểu học. Từng bước nhỏ, trên một hành trình dài.</p>
+          <DemNgay />
+          <h1>Xây nền trí tuệ. <span className="tc-mo__nhat">Toán tư duy, tiếng Anh và luyện thi vào lớp 6 cho các con tiểu học. Từng bước nhỏ, trên một hành trình dài.</span></h1>
           <div className="tc-mo__nut">
             <Link to="/ho-so-mau" className="tc-nut tc-nut--chinh">Xem hồ sơ mẫu</Link>
             <Link to="/dang-nhap" className="tc-nut tc-nut--phu">Đăng nhập</Link>
@@ -143,6 +160,11 @@ export default function TrangChu() {
               <p className="tc-o__nhan">Lớp 5</p>
               <h3>Luyện thi vào lớp 6 Trần Đại Nghĩa.</h3>
               <p className="tc-o__mo">Lộ trình từ 14/12/2026 đến 30/06/2027, bám sát cấu trúc đề thật của ba năm gần nhất.</p>
+              <div className="tc-mau" aria-hidden="true">
+                <div className="tc-mau__dau"><span>Đề thi thử trên máy</span><b>59:42</b></div>
+                <div className="tc-mau__o">{Array.from({ length: 20 }, (_, i) => <i key={i} className={i < 7 ? "xong" : i === 7 ? "dang" : ""} />)}</div>
+                <div className="tc-mau__thanh"><span style={{ width: "35%" }} /></div>
+              </div>
               <div className="tc-o__so">
                 <div><b>18</b><span>tuần học</span></div>
                 <div><b>5</b><span>bài kiểm tra Mốc</span></div>
@@ -150,15 +172,24 @@ export default function TrangChu() {
               </div>
               <div className="tc-o__cay" aria-hidden="true"><img src="/hinh/lop-tim.svg" alt="" /></div>
             </article>
-            <article className="tc-o">
+            <article className="tc-o tc-o--bon">
               <p className="tc-o__nhan">Lớp 4</p>
               <h3>Toán tư duy và ngữ pháp tiếng Anh.</h3>
               <p className="tc-o__mo">Toán tư duy đi tiếp một bậc, cùng nền ngữ pháp vững để con đọc và viết câu đúng.</p>
+              <div className="tc-mau" aria-hidden="true">
+                <p className="tc-mau__cau">She <u>?</u> to school every day.</p>
+                <div className="tc-mau__chon"><span>go</span><span className="dung">goes</span><span>going</span></div>
+              </div>
             </article>
-            <article className="tc-o">
+            <article className="tc-o tc-o--ba">
               <p className="tc-o__nhan">Lớp 3</p>
               <h3>Toán tư duy.</h3>
               <p className="tc-o__mo">Con làm quen với cách nghĩ có hệ thống: vẽ ra để thấy, chia trường hợp không sót, tìm quy luật.</p>
+              <div className="tc-mau" aria-hidden="true">
+                <p className="tc-mau__cau">Tìm số tiếp theo</p>
+                <div className="tc-mau__day"><span>2</span><span>5</span><span>10</span><span>17</span><span className="dung">26</span></div>
+                <p className="tc-mau__goi">Mỗi số bằng một số nhân với chính nó, rồi cộng 1.</p>
+              </div>
             </article>
           </div>
         </div>
