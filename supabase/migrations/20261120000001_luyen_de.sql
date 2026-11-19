@@ -1,4 +1,4 @@
--- Luyện đề trên Supabase (20/11/2026)
+-- Luyện đề trên Supabase (19/11/2026; tiền tố 20261120 của tên tệp chỉ là số thứ tự)
 -- Thay kho kín Google Apps Script của luyende.tramtuduy.org. Cô Trang chọn hướng này ngày 19/11/2026.
 -- Nguyên tắc:
 --   1. Học sinh không đăng nhập. Mỗi con có một mã riêng khó đoán (bảng ma_thi), nằm trong đường dẫn cá nhân.

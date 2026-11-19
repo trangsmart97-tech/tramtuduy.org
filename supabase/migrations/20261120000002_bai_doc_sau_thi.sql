@@ -1,4 +1,4 @@
--- Luyện đề, bản 2 (20/11/2026): bài đọc ở màn hình kết quả, giờ đóng chung của một phần.
+-- Luyện đề, bản 2 (19/11/2026): bài đọc ở màn hình kết quả, giờ đóng chung của một phần.
 -- Theo tầng 5 lần 3 của đề đầu vào, việc 11 và 12.
 -- 1. Sau giờ thi, màn hình kết quả hiện lại các khối bài đọc ("doan") để con đọc lại khi xem lời giải.
 --    Chỉ khối ghi "anSauThi": true (hoặc "anSauKetQua": true) bị bỏ, ví dụ bài thơ chưa có quyền đăng.

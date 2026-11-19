@@ -26,7 +26,7 @@ for (let i = 2; i < process.argv.length; i++) {
   thamSo[k.slice(2)] = v;
 }
 const dung = (chu) => { console.error("DỪNG: " + chu); process.exit(1); };
-if (!thamSo.de || !thamSo.mo || !thamSo.dong) dung("cần --de, --mo, --dong. Xem đầu tệp này.");
+if (!thamSo.de) dung("cần --de (và --mo, --dong nếu tệp đề không ghi moDe, dongDe). Xem đầu tệp này.");
 
 const tepDe = path.resolve(thamSo.de);
 const tepDa = path.resolve(thamSo["dap-an"] || tepDe.replace(/\.json$/, ".dapan.json"));
@@ -39,9 +39,13 @@ if (!/^[a-z0-9-]+$/.test(ma || "")) dung("tệp đề thiếu “ma” hoặc m�
 if (da.ma && da.ma !== ma) dung(`mã đề trong tệp đáp án (${da.ma}) khác tệp đề (${ma}).`);
 
 const moc = (s, ten) => { const t = Date.parse(s); if (isNaN(t) || !/[+-]\d\d:?\d\d$|Z$/.test(s)) dung(`--${ten} phải ghi kèm múi giờ, ví dụ 2026-12-09T19:45+07:00`); return new Date(t).toISOString(); };
-const mo = moc(thamSo.mo, "mo"), dong = moc(thamSo.dong, "dong");
+// Giờ mở, giờ đóng: lấy từ lệnh (--mo, --dong) nếu có, không thì từ tệp đề ("moDe", "dongDe").
+if (!thamSo.mo && !de.moDe) dung("thiếu giờ mở: ghi --mo hoặc \"moDe\" trong tệp đề.");
+if (!thamSo.dong && !de.dongDe) dung("thiếu giờ đóng: ghi --dong hoặc \"dongDe\" trong tệp đề.");
+const mo = moc(thamSo.mo || de.moDe, "mo"), dong = moc(thamSo.dong || de.dongDe, "dong");
+const phutAnh = Number((de.phan || []).slice(-1)[0]?.phutNopAnh) || 0;
 if (dong <= mo) dung("--dong phải sau --mo.");
-const tongPhut = (de.phan || []).reduce((s, p) => s + Number(p.phut || 0), 0);
+const tongPhut = (de.phan || []).reduce((s, p) => s + Number(p.phut || 0), 0) + phutAnh;
 if ((Date.parse(dong) - Date.parse(mo)) / 60000 < tongPhut) console.warn(`LƯU Ý: khoảng mở đề ngắn hơn tổng thời gian các phần (${tongPhut} phút).`);
 const loai = thamSo.loai || (ma === "dau-vao" ? "dau_vao" : /^moc-/.test(ma) ? "moc" : /^thuc-chien/.test(ma) ? "thuc_chien" : /^tang3-/.test(ma) ? "tang3" : "de");
 // Đề có giám sát (đầu vào, Mốc, Thực chiến) không xáo phương án: cô chữa bài theo chữ cái, bản giấy phải khớp bản web
@@ -126,6 +130,9 @@ const soCau = de.phan.reduce((s, p) => s + p.muc.filter((m) => m.loai !== "doan"
 console.log(`Đề “${daDang.ten}” (mã ${ma}) đạt kiểm.`);
 console.log(`  ${de.phan.length} phần, ${soCau} câu, ${tongPhut} phút; loại ${loai}, độ tin cậy ${doTinCay}${tuan !== null ? ", tuần " + tuan : ""}.`);
 console.log(`  Mở ${mo}, đóng ${dong}${thamSo["ma-phong"] && thamSo["ma-phong"] !== true ? ", có mã phòng thi" : ", không mã phòng thi"}.`);
+console.log(phutAnh ? `  Phần cuối có ${phutAnh} phút chỉ để gửi ảnh sau giờ làm bài (đã tính vào tổng phút).` : "  Không có giờ gửi ảnh riêng.");
+const moLucCuoi = Date.parse((de.phan || []).slice(-1)[0]?.moLuc || "");
+if (phutAnh && !isNaN(moLucCuoi)) { const hetAnh = new Date(moLucCuoi + (Number(de.phan.slice(-1)[0].phut) + phutAnh) * 60000).toISOString(); if (hetAnh !== dong) console.warn(`  LƯU Ý: phần cuối mở ${new Date(moLucCuoi).toISOString()} + ${de.phan.slice(-1)[0].phut} phút làm + ${phutAnh} phút ảnh = ${hetAnh}, khác giờ đóng ${dong}.`); }
 console.log(`  ${daDang.tep} tệp hình và bản ghi, tổng ${Math.round(tep.reduce((s, t) => s + t.co, 0) / 1024)} KB.`);
 const dsDoan = de.phan.flatMap((p) => p.muc.filter((m) => m.loai === "doan"));
 const ten = (m) => `“${(m.tieuDe || "không tên").slice(0, 60)}”`;

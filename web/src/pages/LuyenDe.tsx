@@ -106,6 +106,7 @@ function LuotVaCham({ maDe }: { maDe: string }) {
           </table></div>
         )}
         <p className="rat-nho" style={{ marginTop: 8 }}>Số lần rời trang in đỏ khi từ 3 lần trở lên. Đưa chuột vào số để xem giờ của từng lần.</p>
+        <NopGiup maDe={maDe} dong={d.de.dong} soDangDo={d.luot.filter((l) => !l.nop).length} daXong={tai} />
       </div></section>
       <section className="phan"><div className="khung">
         <div className="tieu"><h2>Câu tự luận</h2>
@@ -118,6 +119,26 @@ function LuotVaCham({ maDe }: { maDe: string }) {
         </div>
       </div></section>
     </>
+  );
+}
+
+// Sau giờ đóng 2 phút, lượt nào còn dở (con sập máy, không mở lại) thì cô nộp giúp với phần con đã lưu.
+function NopGiup({ maDe, dong, soDangDo, daXong }: { maDe: string; dong: string; soDangDo: number; daXong: () => void }) {
+  const [tt, setTt] = useState<string>("");
+  if (soDangDo === 0) return null;
+  const daDong = Date.now() > Date.parse(dong) + 2 * 60000;
+  if (!daDong) return <p className="nho" style={{ marginTop: 8 }}>{soDangDo} lượt đang làm. Sau giờ đóng 2 phút, lượt nào còn dở thì cô nộp giúp được ở đây.</p>;
+  const nop = async () => {
+    if (!window.confirm(`Nộp giúp ${soDangDo} lượt còn dở với phần các con đã lưu?`)) return;
+    setTt("Đang nộp giúp…");
+    try { const r = await goi<{ daNopGiup: number }>("ld_co_nop_ho", { p_de: maDe }); setTt(`Đã nộp giúp ${r.daNopGiup} lượt.`); daXong(); }
+    catch (e) { setTt((e as Error).message); }
+  };
+  return (
+    <div className="hang" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
+      <button className="nut" onClick={nop}>Nộp giúp {soDangDo} lượt còn dở</button>
+      {tt && <span className="nho" role="status">{tt}</span>}
+    </div>
   );
 }
 

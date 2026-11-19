@@ -129,8 +129,10 @@ kiem(deKq && deKq.phan.length === 2 && deKq.phan[1].muc.length === 5 && deKq.pha
   await vaiGoc();
   const k = (await mot(`select noi_bo.ld_de_khong_doan($1) k`, [deAn]))[0].k;
   const s = JSON.stringify(k);
-  kiem(k.phan[0].muc.length === 2 && s.includes("Bài đọc rùa biển") && !s.includes("BÀI THƠ KÍN") && !s.includes("nghe.mp3") && !s.includes("soLanNghe"),
-    "chỉ bỏ khối anSauThi/anSauKetQua; khối còn lại không kèm bản ghi nghe", k.phan[0].muc);
+  const an2 = k.phan[0].muc.filter(m => m.anSauThi);
+  kiem(k.phan[0].muc.length === 4 && s.includes("Bài đọc rùa biển") && !s.includes("BÀI THƠ KÍN") && !s.includes("nghe.mp3") && !s.includes("soLanNghe")
+       && an2.length === 2 && an2.every(m => Object.keys(m).sort().join() === "anSauThi,loai,tieuDe") && an2[0].tieuDe === "Trên gác xép",
+    "khối anSauThi/anSauKetQua chỉ còn tiêu đề (không nội dung); khối còn lại không kèm bản ghi nghe", k.phan[0].muc);
   const loiMoi2 = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ phan: [{ ten: "P1", phut: 5, dongLuc: "20:15", muc: [{ loai: "doan", tieuDe: "T", anSauThi: "co" }] }] }, { cau: {} }])).map(r => r.l);
   kiem(loiMoi2.length === 2 && loiMoi2.some(l => l.includes("dongLuc")) && loiMoi2.some(l => l.includes("anSauThi")), "kiểm đề bắt dongLuc sai dạng và anSauThi không phải true/false", loiMoi2);
   const loiDung = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ phan: [{ ten: "P1", phut: 5, dongLuc: "2026-12-09T20:15:00+07:00", muc: [{ loai: "doan", tieuDe: "T", anSauThi: true }] }] }, { cau: {} }])).map(r => r.l);
@@ -206,6 +208,57 @@ await vaiKhach();
 r = await goi("ld_vao", MA, "de-mau"); kiem(/Đường dẫn chưa đúng/.test(r.loi || ""), "mã cũ của An hết dùng được", r);
 r = await goi("ld_vao", maMoiAn, "de-mau"); kiem(r.kq && r.kq.daNop === true, "mã mới của An vào được, thấy đã nộp", r);
 await vaiGoc();
+
+console.log("5c. 5 phút gửi ảnh (QĐ-015) và cô nộp giúp lượt còn dở");
+{
+  await vaiGoc();
+  const deA = { ma: "de-anh", tieuDe: "Đề thử gửi ảnh", phan: [
+    { ten: "Trắc nghiệm", phut: 1, muc: [{ loai: "chon", id: "a1", luaChon: ["1", "2"] }] },
+    { ten: "Tự luận", phut: 1, phutNopAnh: 5, muc: [{ loai: "dien", id: "d1", cau: "2 + 5 = ____" }, { loai: "tuluan", id: "t1", cau: "Viết đoạn văn." }] }] };
+  const gocA = { nhom: "Toán", chuDe: "TO04", kyNang: "KN01", bloom: "Hiểu" };
+  const daA = { cau: { a1: { ...gocA, loai: "chon", dung: 1, diem: 1 }, d1: { ...gocA, loai: "dien", dapAn: ["7"], diem: 2 }, t1: { ...gocA, loai: "tuluan", diem: 5 } } };
+  kiem((await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [deA, daA])).length === 0, "đề có phutNopAnh ở phần cuối: không lỗi");
+  const deSai = JSON.parse(JSON.stringify(deA)); deSai.phan[0].phutNopAnh = 5; deSai.phan[1].phutNopAnh = 30; deSai.dongDe = "21:20";
+  const loiA = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [deSai, daA])).map(r => r.l);
+  kiem(loiA.length === 3, "bắt phutNopAnh ngoài phần cuối, quá 15 phút, dongDe sai dạng", loiA);
+  await mot(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, noi_dung) values ('de-anh', 'Đề thử gửi ảnh', 'dau_vao', now() - interval '1 hour', now() + interval '1 hour', $1)`, [deA]);
+  await mot(`insert into public.dap_an_de values ('de-anh', $1)`, [daA]);
+  const hsDung = (await mot(`select id from public.hoc_sinh where ma_hs='MAU-05'`))[0].id;
+  await mot(`insert into public.ma_thi (hoc_sinh_id, ma) values ($1, 'thu0dung00000000000000000005') on conflict (hoc_sinh_id) do update set ma = excluded.ma`, [hsDung]);
+  const MC = "thu0chi000000000000000000004", MD = "thu0dung00000000000000000005";
+  await vaiKhach();
+  r = await goi("ld_khoa", MC, "de-anh", {}, []); kiem(/lượt thi/.test(r.loi || ""), "chưa bắt đầu thì không khoá được", r);
+  await goi("ld_bat_dau", MC, "de-anh", null); await goi("ld_bat_dau", MD, "de-anh", null);
+  await goi("ld_luu", MC, "de-anh", { a1: 1, d1: "6" }, [], 1);
+  r = await goi("ld_khoa", MC, "de-anh", { a1: 1, d1: "7", t1: "Con gõ một ít." }, [{ loai: "roi" }]);
+  const khoa1 = r.kq && r.kq.khoaLuc;
+  kiem(r.kq && r.kq.ok && khoa1 > 0, "hết giờ làm bài: khoá bài", r);
+  r = await goi("ld_khoa", MC, "de-anh", { d1: "999" }, []); kiem(r.kq && r.kq.khoaLuc === khoa1, "khoá lần hai không đổi giờ khoá", r);
+  r = await goi("ld_luu", MC, "de-anh", { a1: 0, d1: "999", t1: "sửa sau giờ" }, [{ loai: "roi" }, { loai: "roi" }], 1); kiem(r.kq && r.kq.khoa === true, "lưu sau khi khoá không đổi bài", r);
+  r = await goi("ld_bat_dau", MC, "de-anh", null);
+  kiem(r.kq && r.kq.khoaLuc === khoa1 && r.kq.traLoi.d1 === "7" && r.kq.phan === 1, "mở lại trong giờ gửi ảnh: biết đã khoá, bài giữ như lúc khoá", r.kq && { k: r.kq.khoaLuc, d1: r.kq.traLoi.d1, p: r.kq.phan });
+  r = await goi("ld_tai_anh", MC, "de-anh", "t1", "/9j/4AAQSkZJRg=="); kiem(r.kq && r.kq.id, "trong 5 phút gửi ảnh được", r);
+  await vaiGoc(); await mot(`update public.luot_thi set khoa_luc = now() - interval '7 minutes' where hoc_sinh_id = $1 and ma_de = 'de-anh'`, [hsChi]); await vaiKhach();
+  r = await goi("ld_tai_anh", MC, "de-anh", "t1", "/9j/4AAQSkZJRg=="); kiem(/hết giờ gửi ảnh/.test(r.loi || ""), "quá 5 phút (thêm 1 phút) thì không nhận ảnh", r);
+  r = await goi("ld_nop", MC, "de-anh", { a1: 0, d1: "999" }, []);
+  kiem(r.kq && r.kq.diemMay === 3 && r.kq.soCauChoCham === 1, "nộp: chấm phần đã lưu lúc khoá (a1 đúng, d1 = 7), bỏ phần trang gửi sau", r.kq && { d: r.kq.diemMay, c: r.kq.soCauChoCham });
+  await vaiGoc();
+  const dongAnh = (await mot(`select l.tra_loi, (select count(*)::int from public.anh_nop a where a.luot_thi_id = l.id) anh from public.luot_thi l where hoc_sinh_id = $1 and ma_de = 'de-anh'`, [hsChi]))[0];
+  kiem(dongAnh.tra_loi.t1 === "Con gõ một ít." && dongAnh.anh === 1, "bài gõ và ảnh còn nguyên cho cô chấm", dongAnh);
+  // Dũng bỏ dở, không mở lại; cô nộp giúp sau giờ đóng
+  await vaiCo("co.cham@vi-du.test");
+  r = await goi("ld_co_nop_ho", "de-anh"); kiem(/chưa đóng/.test(r.loi || ""), "đề chưa đóng thì chưa nộp giúp", r);
+  await vaiGoc(); await mot(`update public.de_thi set dong = now() - interval '3 minutes', mo = now() - interval '2 hours' where ma = 'de-anh'`);
+  await vaiCo("co.giaovu@vi-du.test");
+  r = await goi("ld_co_nop_ho", "de-anh"); kiem(/chấm bài/.test(r.loi || ""), "cô giáo vụ không nộp giúp được", r);
+  await vaiCo("co.cham@vi-du.test");
+  r = await goi("ld_co_nop_ho", "de-anh"); kiem(r.kq && r.kq.daNopGiup === 1, "cô chấm bài nộp giúp 1 lượt còn dở", r);
+  r = await goi("ld_co_nop_ho", "de-anh"); kiem(r.kq && r.kq.daNopGiup === 0, "nộp giúp lần hai không còn gì", r);
+  await vaiKhach();
+  r = await goi("ld_tai_anh", MD, "de-anh", "t1", "/9j/4AAQSkZJRg=="); kiem(/đã nộp/.test(r.loi || ""), "sau khi nộp giúp, con không gửi thêm ảnh", r);
+  await vaiGoc();
+  kiem((await mot(`select count(*)::int n from public.bai_lam where hoc_sinh_id = $1 and ma_bai = 'de-anh'`, [hsDung]))[0].n === 1, "lượt của Dũng đã thành bài làm trong hồ sơ");
+}
 
 console.log("8. coChamTay và mẹo");
 const cham = async (dapAn, tl) => (await mot(`select noi_bo.ld_cham($1,$2) k`, [dapAn, tl]))[0].k;
