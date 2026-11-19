@@ -36,3 +36,25 @@ supabase db query --remote=pqildzyhzpudfkjinhyx -f supabase/seed/02_hoc_sinh_mau
 ```
 
 Không đưa dữ liệu học sinh thật vào kho này.
+
+## Luyện đề (luyende.tramtuduy.org)
+
+Kho kín của trang thi luyende nằm ở Supabase này (QĐ-011, 19/11/2026). Lược đồ: `supabase/migrations/20261120000001_luyen_de.sql`.
+- Mỗi con vào thi bằng đường dẫn riêng `https://luyende.tramtuduy.org/thi.html?de=<mã đề>&ma=<mã riêng>`, không mật khẩu.
+- Đề, đáp án, lượt thi chỉ các cô đọc được. Trang thi chỉ gọi các hàm `ld_*`; trang của cô gọi các hàm `ld_co_*`.
+- Nộp bài thì máy chấm và ghi vào `bai_lam`, `cau_tra_loi` (đủ bốn nhãn); câu cô chấm vào `cham_tay`. Điểm cô chấm tự cộng vào bài làm.
+- Trang của cô: Bàn làm việc của cô → Luyện đề (`#/nhan-su/luyen-de`): lượt thi, chấm câu tự luận, đường dẫn riêng.
+
+Công cụ ở `cong-cu/luyen-de/` (cài một lần: `npm install` trong thư mục đó):
+
+```bash
+# Thử lược đồ và hàm chấm trên Postgres cục bộ, không cần Docker
+node cong-cu/luyen-de/thu.mjs "$PWD" "$(dirname "$PWD")"
+```
+
+```bash
+# Đưa một đề đã duyệt từ "08 CHỜ ĐĂNG WEB/" lên: kiểm đề, viết tệp SQL vào supabase/.temp/ (không vào git), in lệnh đăng
+node cong-cu/luyen-de/dang_de.mjs --de "../08 CHỜ ĐĂNG WEB/de-dau-vao.json" --mo 2026-12-09T19:45+07:00 --dong 2026-12-09T21:15+07:00 --ma-phong 1234
+```
+
+Quy ước tệp đề cho người soạn: ghi chú `web-quy-uoc-tep-de.md` trong thư mục ghi chú chung của các session. Không đưa tệp đề thật hay tệp đáp án thật vào kho này.

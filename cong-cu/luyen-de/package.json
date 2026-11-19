@@ -1,0 +1,7 @@
+{
+  "name": "luyen-de",
+  "private": true,
+  "type": "module",
+  "description": "Công cụ luyện đề: thử migration trên Postgres cục bộ (PGlite), máy chủ thử, đưa đề lên",
+  "dependencies": { "@electric-sql/pglite": "0.5.14" }
+}

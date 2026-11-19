@@ -47,6 +47,7 @@ export default function NhanSuTrang() {
       <section className="ho-so-dau"><div className="khung">
         <h1 style={{ marginBottom: 4 }}>Bàn làm việc của cô</h1>
         <p className="nho" style={{ margin: 0 }}>Bốn cô cùng xem toàn bộ dữ liệu. Mỗi loại dữ liệu có một cô làm chủ; mọi lần sửa đều ghi vào nhật ký.</p>
+        {vai && <p className="nho" style={{ margin: "6px 0 0" }}><Link to="/nhan-su/luyen-de">Luyện đề: lượt thi, chấm câu tự luận, đường dẫn riêng của từng con</Link></p>}
         <div className="the-vai" role="tablist">
           {VAI.map((v) => <button key={v.ma} role="tab" aria-selected={tab === v.ma} className={tab === v.ma ? "dang" : ""} onClick={() => setTab(v.ma)}>{v.nhan}</button>)}
         </div>
