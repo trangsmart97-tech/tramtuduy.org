@@ -53,6 +53,10 @@ p { margin: 0 0 1em; }
 .nho { font-size: 14px; color: var(--chu-phu); }
 .rat-nho { font-size: 13px; color: var(--chu-mo); }
 
+/* Nền động “Khu vườn tri thức” (components/NenSong.tsx): sau mọi nội dung, không nhận chuột */
+.nen-song { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; display: block; max-width: none; }
+.nen-song--truoc { z-index: 65; }
+
 /* Đầu trang */
 .dau-trang { position: sticky; top: 0; z-index: 70; background: rgba(255,255,255,.82); border-bottom: 1px solid rgba(70,54,101,.08); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); }
 .dau-trang .khung { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }

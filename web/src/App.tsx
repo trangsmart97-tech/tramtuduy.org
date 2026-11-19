@@ -2,6 +2,7 @@ import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { NguoiDungProvider } from "./lib/nguoiDung";
 import { ChanTrang, DauTrang } from "./components/Khung";
+import NenSong from "./components/NenSong";
 import TrangChu from "./pages/TrangChu";
 import { TrangHoSo, TrangHoSoMau } from "./pages/HoSo";
 import BaoCaoTuan from "./pages/BaoCaoTuan";
@@ -19,6 +20,7 @@ export default function App() {
     <NguoiDungProvider>
       <HashRouter>
         <CuonLenDau />
+        <NenSong />
         <DauTrang />
         <Routes>
           <Route path="/" element={<TrangChu />} />
