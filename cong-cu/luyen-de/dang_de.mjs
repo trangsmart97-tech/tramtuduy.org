@@ -131,6 +131,13 @@ console.log(`Đề “${daDang.ten}” (mã ${ma}) đạt kiểm.`);
 console.log(`  ${de.phan.length} phần, ${soCau} câu, ${tongPhut} phút; loại ${loai}, độ tin cậy ${doTinCay}${tuan !== null ? ", tuần " + tuan : ""}.`);
 console.log(`  Mở ${mo}, đóng ${dong}${thamSo["ma-phong"] && thamSo["ma-phong"] !== true ? ", có mã phòng thi" : ", không mã phòng thi"}.`);
 console.log(phutAnh ? `  Phần cuối có ${phutAnh} phút chỉ để gửi ảnh sau giờ làm bài (đã tính vào tổng phút).` : "  Không có giờ gửi ảnh riêng.");
+// Giờ riêng cho từng lượt (QĐ-018): bạn bắt đầu đúng giờ muộn nhất phải làm xong trước giờ đóng.
+if (de.batDauMuonNhat) {
+  const xongMuonNhat = Date.parse(de.batDauMuonNhat) + tongPhut * 60000;
+  console.log(`  Giờ bắt đầu muộn nhất ${new Date(Date.parse(de.batDauMuonNhat)).toISOString()}; bạn bắt đầu lúc ấy làm xong lúc ${new Date(xongMuonNhat).toISOString()}.`);
+  if (xongMuonNhat > Date.parse(dong)) console.warn(`  LƯU Ý: giờ đóng ${dong} SỚM HƠN giờ làm xong của bạn bắt đầu muộn nhất. Bạn ấy sẽ bị cắt giờ.`);
+  else if (Date.parse(dong) - xongMuonNhat < 3 * 60000) console.warn(`  LƯU Ý: giờ đóng chỉ dư ${Math.round((Date.parse(dong) - xongMuonNhat) / 60000)} phút sau giờ làm xong muộn nhất; nên dư khoảng 5 phút cho mạng chậm.`);
+}
 const moLucCuoi = Date.parse((de.phan || []).slice(-1)[0]?.moLuc || "");
 if (phutAnh && !isNaN(moLucCuoi)) { const hetAnh = new Date(moLucCuoi + (Number(de.phan.slice(-1)[0].phut) + phutAnh) * 60000).toISOString(); if (hetAnh !== dong) console.warn(`  LƯU Ý: phần cuối mở ${new Date(moLucCuoi).toISOString()} + ${de.phan.slice(-1)[0].phut} phút làm + ${phutAnh} phút ảnh = ${hetAnh}, khác giờ đóng ${dong}.`); }
 console.log(`  ${daDang.tep} tệp hình và bản ghi, tổng ${Math.round(tep.reduce((s, t) => s + t.co, 0) / 1024)} KB.`);

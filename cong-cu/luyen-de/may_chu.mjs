@@ -20,10 +20,19 @@ const de = doc(tepDe), da = doc(tepDa);
 if (process.env.XAO || process.argv[8] === "xao") de.xaoPhuongAn = true;
 const nhan = { "Toán": "TO04", "Tiếng Anh": "TA03", "Tiếng Việt": "TV02", "Khoa học": "KH01", "Lịch sử và Địa lý": "LS03" };
 for (const k of Object.values(da.cau)) { k.chuDe = k.chuDe || nhan[k.nhom]; k.kyNang = k.kyNang || "KN01"; k.bloom = k.bloom || "Hiểu"; }
+// Đối số 13 = "gioRieng": giờ bắt đầu muộn nhất là 30 phút nữa (thử QĐ-018).
+if (process.argv[13] === "gioRieng") de.batDauMuonNhat = new Date(Date.now() + 30 * 60000).toISOString().replace(/\.\d+Z$/, "Z");
 // Đối số 12 = "anTho": đánh dấu khối bài đọc đầu tiên "anSauThi": true (thử khối ẩn sau giờ thi).
 if (process.argv[12] === "anTho") { const k = de.phan.flatMap(p => p.muc).find(m => m.loai === "doan"); if (k) k.anSauThi = true; }
 // Đối số 11 = "nopAnh": thử giờ gửi ảnh với giờ rút ngắn (Phần 1: nửa phút, phần cuối: 1 phút làm + 2 phút gửi ảnh).
-if (process.argv[11] === "nopAnh") { de.phan[0].phut = 0.5; de.phan[de.phan.length - 1].phut = 1; de.phan[de.phan.length - 1].phutNopAnh = 2; }
+if (process.argv[11] === "nopAnh") {
+  const cuoi = de.phan[de.phan.length - 1];
+  de.phan[0].phut = 0.5; cuoi.phut = 1; cuoi.phutNopAnh = 2;
+  // Câu tl4 cần ảnh và có tên như trong đề; thêm câu tự luận tl5 không cần ảnh.
+  const tl4 = cuoi.muc.find(m => m.id === "tl4"); if (tl4) { tl4.canAnh = true; tl4.tenCau = "Bài 3"; }
+  cuoi.muc.push({ loai: "tuluan", id: "tl5", diem: 2, cau: "Câu tự luận không cần ảnh (thử)." });
+  da.cau.tl5 = { loai: "tuluan", diem: 2, nhom: "Tiếng Việt", chuDe: "TV02", kyNang: "KN01", bloom: "Hiểu" };
+}
 // Đối số 10 (tuỳ chọn): số phút nữa thì Phần 1 đóng chung cho mọi bạn (thử "dongLuc").
 if (process.argv[10]) de.phan[0].dongLuc = new Date(Date.now() + Number(process.argv[10]) * 60000).toISOString();
 if (process.argv[7] && de.phan[1]) de.phan[1].moLuc = new Date(Date.now() + Number(process.argv[7]) * 60000).toISOString();

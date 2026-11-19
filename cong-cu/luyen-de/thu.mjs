@@ -260,6 +260,32 @@ console.log("5c. 5 phút gửi ảnh (QĐ-015) và cô nộp giúp lượt còn 
   kiem((await mot(`select count(*)::int n from public.bai_lam where hoc_sinh_id = $1 and ma_bai = 'de-anh'`, [hsDung]))[0].n === 1, "lượt của Dũng đã thành bài làm trong hồ sơ");
 }
 
+console.log("5d. Giờ riêng cho từng lượt (QĐ-018): giờ bắt đầu muộn nhất");
+{
+  await vaiGoc();
+  const deM = { ma: "de-muon", tieuDe: "Đề thử giờ riêng", batDauMuonNhat: new Date(Date.now() + 60000).toISOString().replace(/\.\d+Z$/, "Z"),
+    phan: [{ ten: "P", phut: 1, muc: [{ loai: "chon", id: "m1", luaChon: ["1", "2"] }] }] };
+  const daM = { cau: { m1: { loai: "chon", dung: 1, diem: 1, nhom: "Toán", chuDe: "TO04", kyNang: "KN01", bloom: "Hiểu" } } };
+  kiem((await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [deM, daM])).length === 0, "batDauMuonNhat đúng dạng: không lỗi");
+  kiem((await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ ...deM, batDauMuonNhat: "20:00" }, daM])).length === 1, "batDauMuonNhat sai dạng: bắt được");
+  await mot(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, noi_dung) values ('de-muon', 'Đề thử giờ riêng', 'de', now() - interval '1 hour', now() + interval '1 hour', $1)`, [deM]);
+  await mot(`insert into public.dap_an_de values ('de-muon', $1)`, [daM]);
+  await vaiKhach();
+  r = await goi("ld_vao", maMoiAn, "de-muon"); kiem(r.kq && r.kq.batDauMuonNhat === Date.parse(deM.batDauMuonNhat), "màn hình vào biết giờ bắt đầu muộn nhất", r.kq && r.kq.batDauMuonNhat);
+  r = await goi("ld_bat_dau", maMoiAn, "de-muon", null); kiem(r.kq && r.kq.de, "trước giờ bắt đầu muộn nhất: vào được", r.loi);
+  await vaiGoc();
+  await mot(`update public.de_thi set noi_dung = jsonb_set(noi_dung, '{batDauMuonNhat}', to_jsonb(to_char((now() - interval '1 minute') at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))) where ma = 'de-muon'`);
+  await vaiKhach();
+  r = await goi("ld_bat_dau", "thu0chi000000000000000000004", "de-muon", null); kiem(/quá giờ vào thi/.test(r.loi || ""), "sau giờ bắt đầu muộn nhất: lượt mới bị chặn", r);
+  r = await goi("ld_bat_dau", maMoiAn, "de-muon", null); kiem(r.kq && r.kq.tiepTuc === true, "lượt đã bắt đầu vẫn vào lại được", r.loi);
+  await vaiGoc();
+  await mot(`update public.luot_thi set bat_dau = now() - interval '10 minutes' where ma_de = 'de-muon'`);
+  await vaiKhach();
+  r = await goi("ld_nop", maMoiAn, "de-muon", { m1: 1 }, []); kiem(r.kq && r.kq.diemMay === 1, "nộp được", r);
+  await vaiGoc();
+  kiem((await mot(`select nop_muon from public.luot_thi where ma_de = 'de-muon'`))[0].nop_muon === true, "nộp quá giờ riêng của lượt (1 phút + 2 phút): ghi nộp muộn dù đề chưa đóng");
+}
+
 console.log("8. coChamTay và mẹo");
 const cham = async (dapAn, tl) => (await mot(`select noi_bo.ld_cham($1,$2) k`, [dapAn, tl]))[0].k;
 const daCt = { cau: {
