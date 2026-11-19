@@ -84,7 +84,7 @@ export default function TrangChu() {
   return (
     <div className="tc" ref={goc}>
       {/* 1. Mở đầu: nhiều lớp trôi ở nhịp khác nhau */}
-      <section className="tc-mo" data-sc-act="flow" data-sc-drift="#FFFFFF">
+      <section className="tc-mo" data-sc-act="flow">
         <div className="tc-mo__chu sc-wrap">
           <h1>Xây nền trí tuệ.</h1>
           <p className="sc-body">Toán tư duy, tiếng Anh và luyện thi vào lớp 6 cho các con tiểu học. Từng bước nhỏ, trên một hành trình dài.</p>
@@ -102,11 +102,10 @@ export default function TrangChu() {
           {/* Chú ong viết thông điệp trên hai trang; chữ hoá giọt mật nuôi rễ; dòng mật dâng lên, bộ não bừng sáng (cong-cu/tao_canh_ong.py) */}
           <CanhOng />
         </div>
-        <div className="tc-mo__ha" />
       </section>
 
       {/* 2. Đỉnh: cây lớn lên từ trang vở theo tay người cuộn */}
-      <section className="tc-lon" data-sc-act="pin" data-sc-span="3.4" data-sc-drift="#EEF7F2" aria-label="Ba việc trạm làm cùng các con">
+      <section className="tc-lon" data-sc-act="pin" data-sc-span="3.4" aria-label="Ba việc trạm làm cùng các con">
         <div data-sc-stage className="tc-lon__san">
           <div className="tc-lon__chu">
             <div data-sc-cue="0 0.34 0">
@@ -114,12 +113,12 @@ export default function TrangChu() {
               <h2>Rễ bám sâu trước.</h2>
               <p className="sc-body">Mỗi buổi học là một viên gạch kiến thức. Con hiểu vì sao, không học thuộc, và kiến thức trở lại nhiều lần để nhớ lâu.</p>
             </div>
-            <div data-sc-cue="0.3 0.66">
+            <div data-sc-cue="0.3 0.66" className="tc-lon__dem">
               <p className="tc-lon__buoc">Dựng khung</p>
               <h2>Thân dựng lên vững.</h2>
               <p className="sc-body">Mỗi bài mở bằng một câu hỏi con chưa trả lời được. Con quan sát, dự đoán, kiểm tra, rồi tự rút ra quy tắc.</p>
             </div>
-            <div data-sc-cue="0.62 1">
+            <div data-sc-cue="0.62 1" className="tc-lon__dem">
               <p className="tc-lon__buoc">Bay cao</p>
               <h2>Trí tuệ nở ra.</h2>
               <p className="sc-body">Cuối mỗi bài là một tình huống lạ. Con mang điều vừa học đi giải điều chưa gặp bao giờ.</p>
@@ -133,7 +132,7 @@ export default function TrangChu() {
       </section>
 
       {/* 3. Ba nhóm lớp */}
-      <section className="tc-muc" data-sc-act="flow" data-sc-drift="#FFFFFF">
+      <section className="tc-muc tc-dem" data-sc-act="flow">
         <div className="sc-wrap">
           <div className="tc-muc__dau" data-sc-in>
             <h2>Ba nhóm lớp. Một cách nghĩ.</h2>
@@ -166,7 +165,7 @@ export default function TrangChu() {
       </section>
 
       {/* 4. Hồ sơ học tập: vén màn ảnh thật, số đếm thật */}
-      <section className="tc-muc" data-sc-act="flow" data-sc-drift="#F7F6FB">
+      <section className="tc-muc tc-dem" data-sc-act="flow">
         <div className="sc-wrap">
           <div className="tc-muc__dau tc-hs__dau" data-sc-in>
             <h2>Ba mẹ thấy rõ con đang ở đâu.</h2>
@@ -187,7 +186,7 @@ export default function TrangChu() {
       </section>
 
       {/* 5. Lộ trình trượt ngang */}
-      <section className="tc-lt" data-sc-act="pan" data-sc-span="5.2" data-sc-drift="#FFFFFF">
+      <section className="tc-lt tc-dem" data-sc-act="pan" data-sc-span="5.2">
         <div data-sc-stage className="tc-lt__san">
           <div className="tc-lt__ray" data-sc-pan="0.04">
             <div className="tc-lt__dau">
@@ -212,7 +211,7 @@ export default function TrangChu() {
       </section>
 
       {/* 6. Bốn cô */}
-      <section className="tc-muc" data-sc-act="flow" data-sc-drift="#FFFFFF">
+      <section className="tc-muc tc-dem" data-sc-act="flow">
         <div className="sc-wrap">
           <div className="tc-muc__dau" data-sc-in>
             <h2>Bốn cô, một hành trình.</h2>
@@ -231,7 +230,7 @@ export default function TrangChu() {
       </section>
 
       {/* 7. Kết: dừng lại, một việc để làm */}
-      <section className="tc-ket" data-sc-act="pin" data-sc-span="1.4" data-sc-drift="#EAF7F1">
+      <section className="tc-ket" data-sc-act="pin" data-sc-span="1.4">
         <div data-sc-stage className="tc-ket__san">
           <div>
             <div className="tc-ket__cay" aria-hidden="true"><CayTriTue /></div>

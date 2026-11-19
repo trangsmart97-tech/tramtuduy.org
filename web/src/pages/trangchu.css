@@ -29,7 +29,6 @@
 .tc-mo__ong svg { width: 100%; height: 100%; max-width: none; overflow: visible; }
 .tc-mo__ong { position: relative; display: block; width: min(96vw, calc(max(100svh - 30rem, 46svh) * 1200 / 660), 1180px); margin-bottom: 1vh; height: auto; max-width: none; aspect-ratio: 1200 / 660; }
 .tc-mo__cay img, .tc-cay img, .tc-ket__cay img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
-.tc-mo__ha { position: absolute; inset: auto 0 0; height: 48px; z-index: 2; background: linear-gradient(to bottom, rgba(255,255,255,0), var(--sc-canvas)); pointer-events: none; }
 
 /* ===== Chặng 2: cây lớn lên (đỉnh) ===== */
 .tc-lon__san { height: 100vh; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); padding-inline: var(--sc-gutter); max-width: 82rem; margin-inline: auto; }
@@ -106,6 +105,20 @@
 .tc-ket h2 { font-size: clamp(2.6rem, 1.5rem + 4vw, 5.2rem); line-height: 1; letter-spacing: -0.035em; margin: 0 0 16px; text-wrap: balance; }
 .tc-ket .sc-body { margin: 0 auto 30px; }
 .tc-ket__nut { display: flex; gap: 22px; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+/* ===== Vũ trụ: chữ sáng trên nền đêm (nền do NenSong vẽ theo vị trí cuộn) ===== */
+.tc-lon__dem { color: #FFF9F0; }
+.tc-lon__dem h2, .tc-dem .tc-muc__dau h2, .tc-dem .tc-lt__dau h2, .tc-dem .tc-co h3 { color: #FFF9F0; }
+.tc-lon__dem .sc-body, .tc-dem .tc-muc__dau .sc-body, .tc-dem .tc-lt__dau .sc-body, .tc-dem .tc-co p, .tc-dem .tc-lt__cuoi, .tc-dem .tc-so span { color: #DDD6F0; }
+.tc-lon__dem .tc-lon__buoc, .tc-dem .tc-co .tc-co__vai { color: #F4C96E; }
+.tc-dem .tc-so b, .tc-dem .tc-lien-ket { color: #FFE08A; }
+.tc-dem .tc-co > div { border-top-color: rgba(255, 249, 240, 0.18); }
+.tc-dem .tc-o { box-shadow: 0 24px 70px rgba(10, 8, 32, 0.45); }
+.tc-dem .tc-o--lon { box-shadow: 0 0 0 1px rgba(255, 249, 240, 0.16), 0 30px 90px rgba(139, 119, 194, 0.4); }
+.tc-dem .tc-khung { border-color: rgba(255, 249, 240, 0.2); box-shadow: 0 30px 100px rgba(139, 119, 194, 0.38), 0 4px 14px rgba(0, 0, 0, 0.3); }
+.tc-dem .tc-chang { border-color: rgba(255, 249, 240, 0.25); box-shadow: 0 18px 50px rgba(10, 8, 32, 0.4); }
+.tc-dem .tc-chang--dich { box-shadow: 0 0 0 1px rgba(255, 224, 138, 0.5), 0 0 60px rgba(246, 196, 83, 0.35); }
+.tc-lon .tc-cay__nen { background: radial-gradient(circle, #ffffff 0%, rgba(255, 249, 240, 0.85) 30%, rgba(234, 225, 255, 0) 68%); }
 
 /* ===== Điện thoại ===== */
 @media (max-width: 760px) {
