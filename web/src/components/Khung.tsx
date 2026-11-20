@@ -6,7 +6,7 @@ export function DauTrang() {
   return (
     <header className="dau-trang">
       <div className="khung">
-        <Link to="/" className="logo" aria-label="Trạm Tư Duy, trang chủ"><img src="/bieu-tuong.svg" alt="" /><span>Trạm Tư Duy</span></Link>
+        <Link to="/" className="logo" aria-label="Trạm Tư Duy, trang chủ"><img src="/bieu-tuong-160.png" alt="" width="40" height="40" /><span>Trạm Tư Duy</span></Link>
         <nav className="menu" aria-label="Điều hướng chính">
           <NavLink to="/" end>Trang chủ</NavLink>
           <NavLink to="/ho-so-mau">Hồ sơ mẫu</NavLink>

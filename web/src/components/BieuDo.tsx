@@ -39,7 +39,7 @@ export function ThanhDich({ dong, dich }: { dong: { ten: string; gt: number; n: 
               <rect x={0} y={y - 4} width={W} height={cao + 8} fill="transparent" />
               <text x={0} y={y + cao / 2 + 5} fontSize="14" fill="#1f1b2b" fontWeight={600}>{d.ten}</text>
               <rect x={nhan} y={y} width={x(100) - nhan} height={cao} rx={4} fill="#f2f0f6" />
-              <rect x={nhan} y={y} width={Math.max(4, x(d.gt) - nhan)} height={cao} rx={4} fill="#463665" />
+              <rect x={nhan} y={y} width={Math.max(4, x(d.gt) - nhan)} height={cao} rx={4} fill="#2B1C47" />
               <text x={x(d.gt) + 8} y={y + cao / 2 + 5} fontSize="14" fill="#1f1b2b" fontWeight={700}>{d.gt}%</text>
             </g>
           );
@@ -69,12 +69,12 @@ export function DuongDiem({ diem }: { diem: { nhan: string; ngay: string; gt: nu
             <text x={trai - 8} y={y(t) + 4} fontSize="12" fill="#6a6478" textAnchor="end">{t}</text>
           </g>
         ))}
-        <path d={duong} fill="none" stroke="#463665" strokeWidth={2} />
+        <path d={duong} fill="none" stroke="#2B1C47" strokeWidth={2} />
         {diem.map((d, i) => (
           <g key={i} tabIndex={0} onMouseMove={(e) => hien(e, <><b>{d.nhan}</b> · {d.ngay}<br />{d.gt} điểm trên thang 100<br />{d.chiTiet}</>)} onMouseLeave={an} onFocus={(e) => hien(e, <><b>{d.nhan}</b>: {d.gt}</>)} onBlur={an}>
             <rect x={x(i) - 16} y={tren} width={32} height={H - tren - duoi} fill="transparent" />
             {d.loai === "thuc_chien" ? (
-              <circle cx={x(i)} cy={y(d.gt)} r={5} fill="#463665" stroke="#fff" strokeWidth={2} />
+              <circle cx={x(i)} cy={y(d.gt)} r={5} fill="#2B1C47" stroke="#fff" strokeWidth={2} />
             ) : (
               <rect x={x(i) - 7} y={y(d.gt) - 7} width={14} height={14} rx={2} fill="#7a4e32" stroke="#fff" strokeWidth={2} transform={`rotate(45 ${x(i)} ${y(d.gt)})`} />
             )}
@@ -82,7 +82,7 @@ export function DuongDiem({ diem }: { diem: { nhan: string; ngay: string; gt: nu
           </g>
         ))}
       </svg>
-      <div className="chu-giai"><span><i style={{ background: "#463665", borderRadius: 6 }} />Thực chiến Chủ nhật</span><span><i style={{ background: "#7a4e32" }} />Bài đầu vào và bài Mốc</span><span><i style={{ background: "transparent", borderTop: "2px dashed #d9c6b6", borderRadius: 0, height: 0 }} />Mốc 80 điểm</span></div>
+      <div className="chu-giai"><span><i style={{ background: "#2B1C47", borderRadius: 6 }} />Thực chiến Chủ nhật</span><span><i style={{ background: "#7a4e32" }} />Bài đầu vào và bài Mốc</span><span><i style={{ background: "transparent", borderTop: "2px dashed #d9c6b6", borderRadius: 0, height: 0 }} />Mốc 80 điểm</span></div>
       {lop}
     </figure>
   );
@@ -104,7 +104,7 @@ export function CotDon({ cot, donVi, moTa }: { cot: { ten: string; gt: number; p
           return (
             <g key={c.ten} tabIndex={0} onMouseMove={(e) => hien(e, <><b>{c.ten}</b><br />{c.phu}</>)} onMouseLeave={an} onFocus={(e) => hien(e, <><b>{c.ten}</b>: {c.gt}{donVi}</>)} onBlur={an}>
               <rect x={cx - w / 2} y={tren} width={w} height={H - tren - duoi} fill="transparent" />
-              <path d={`M${cx - bw / 2} ${H - duoi} V${H - duoi - h + 4} Q${cx - bw / 2} ${H - duoi - h} ${cx - bw / 2 + 4} ${H - duoi - h} H${cx + bw / 2 - 4} Q${cx + bw / 2} ${H - duoi - h} ${cx + bw / 2} ${H - duoi - h + 4} V${H - duoi} Z`} fill={c.gt ? "#463665" : "#efedf3"} />
+              <path d={`M${cx - bw / 2} ${H - duoi} V${H - duoi - h + 4} Q${cx - bw / 2} ${H - duoi - h} ${cx - bw / 2 + 4} ${H - duoi - h} H${cx + bw / 2 - 4} Q${cx + bw / 2} ${H - duoi - h} ${cx + bw / 2} ${H - duoi - h + 4} V${H - duoi} Z`} fill={c.gt ? "#2B1C47" : "#efedf3"} />
               <text x={cx} y={H - duoi - h - 6} fontSize="13" fontWeight={700} fill="#1f1b2b" textAnchor="middle">{c.gt}{donVi}</text>
               <text x={cx} y={H - duoi + 18} fontSize="12.5" fill="#4a4458" textAnchor="middle">{c.ten}</text>
             </g>

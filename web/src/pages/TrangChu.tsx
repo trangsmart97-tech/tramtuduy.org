@@ -8,20 +8,14 @@ type ThanhVien = { vai: string; ten_goi: string; mo_ta_vai: string | null; thu_t
 type ScApi = { destroy: () => void; layout: () => void };
 declare global { interface Window { ScrollCraft: { mount: (root: Element) => ScApi } } }
 
-// Ba lớp của logo, cùng một khung toạ độ nên xếp chồng khớp nhau.
+// Các lớp của logo bản 3 (QĐ-024), tách theo màu từ ảnh logo bằng cong-cu/tach_lop_logo.py, không đồ lại nét.
+// Cùng một khung vuông nên xếp chồng khớp nhau: sách (trang và bìa), rễ, thân và não.
 function CayTriTue({ dung }: { dung?: boolean }) {
   return (
     <>
-      <img className="tc-cay__trang" src="/hinh/lop-trang.svg" alt="" />
-      {dung ? (
-        <>
-          <img className="tc-cay__sach" src="/hinh/lop-nau.svg" alt="" />
-          <img className="tc-cay__re" src="/hinh/lop-nau.svg" alt="" />
-        </>
-      ) : (
-        <img src="/hinh/lop-nau.svg" alt="" />
-      )}
-      <img className="tc-cay__than" src="/hinh/lop-tim.svg" alt="" />
+      <img className="tc-cay__sach" src="/hinh/lop-bia.png" alt="" />
+      <img className={dung ? "tc-cay__re" : undefined} src="/hinh/lop-re.png" alt="" />
+      <img className="tc-cay__than" src="/hinh/lop-tim.png" alt="" />
     </>
   );
 }
@@ -171,7 +165,7 @@ export default function TrangChu() {
                 <div><b>5</b><span>bài kiểm tra Mốc</span></div>
                 <div><b>24</b><span>đề thi thử</span></div>
               </div>
-              <div className="tc-o__cay" aria-hidden="true"><img src="/hinh/lop-tim.svg" alt="" /></div>
+              <div className="tc-o__cay" aria-hidden="true"><img src="/hinh/lop-tim.png" alt="" /></div>
             </article>
             <article className="tc-o tc-o--bon">
               <p className="tc-o__nhan">Lớp 4</p>

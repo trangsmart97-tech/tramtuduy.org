@@ -1,11 +1,11 @@
 /* Trạm Tư Duy: bộ nhận diện (THUONG HIEU/DOC TRUOC - BO NHAN DIEN.md)
    Mọi cặp chữ và nền ở đây đã đo tương phản, tối thiểu 4,5 trên 1. */
 :root {
-  --tim: #463665;          /* tím chàm: logo, tiêu đề, nút chính (10,6:1 trên trắng) */
-  --tim-dam: #33254d;
+  --tim: #2B1C47;          /* tím phương án A (QĐ-024): logo, tiêu đề, nút chính (15,4:1 trên trắng) */
+  --tim-dam: #1d1231;
   --tim-nhat: #8b77c2;
   --tim-nen: #efebf7;
-  --dat: #7a4e32;          /* nâu đất: khẩu hiệu, nhấn phụ (7,1:1 trên trắng) */
+  --dat: #7A4B24;          /* nâu chữ phương án A (QĐ-024): khẩu hiệu, nhấn phụ (7,3:1 trên trắng) */
   --dat-nen: #f6ede4;
   --bac-ha: #eaf7f1;       /* nền tươi mát */
   --kem: #fff9f0;          /* nền tài liệu */
@@ -29,7 +29,7 @@
   --sc-surface: #f3f7f5;
   --sc-ink: #1f1b2b;
   --sc-ink-soft: #4a4458;
-  --sc-accent: #463665;
+  --sc-accent: #2B1C47;
   --sc-accent-ink: #ffffff;
   /* Phông hệ thống: SF Pro trên iPhone, iPad, Mac; Inter trên Android, Windows (cô Trang chọn 19/11/2026) */
   --sc-font-display: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;

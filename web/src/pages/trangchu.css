@@ -46,12 +46,12 @@
 .tc-lon__chu > div { grid-area: 1 / 1; }
 .tc-lon__buoc { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; color: var(--dat); text-transform: uppercase; margin: 0 0 10px; }
 .tc-lon__chu h2 { font-size: clamp(2.2rem, 1.3rem + 3vw, 4rem); line-height: 1.18; margin: 0 0 18px; text-wrap: balance; }
-.tc-cay { position: relative; justify-self: center; width: min(74vh, 640px); aspect-ratio: 1632 / 1776;
+.tc-cay { position: relative; justify-self: center; width: min(74vh, 640px); aspect-ratio: 1;
   --re: clamp(0, calc((var(--sc-p, 0) - 0.05) / 0.25), 1);
   --than: clamp(0, calc((var(--sc-p, 0) - 0.33) / 0.5), 1); }
-.tc-cay .tc-cay__sach { clip-path: inset(0 0 20% 0); }
-.tc-cay .tc-cay__re { clip-path: inset(80% 0 calc((1 - var(--re)) * 20%) 0); }
-.tc-cay .tc-cay__than { clip-path: inset(calc((1 - var(--than)) * 78.4%) 0 0 0); transform: scale(calc(0.94 + 0.06 * var(--than))); transform-origin: 50% 78.4%; }
+/* Mốc theo logo bản 3 (cong-cu/tach_lop_logo.py): rễ từ 74,7% đến 94,3% chiều cao; đáy thân ở 74,1%. */
+.tc-cay .tc-cay__re { clip-path: inset(74.7% 0 calc((1 - var(--re)) * 25.3%) 0); }
+.tc-cay .tc-cay__than { clip-path: inset(calc((1 - var(--than)) * 74.1%) 0 0 0); transform: scale(calc(0.94 + 0.06 * var(--than))); transform-origin: 50% 74.1%; }
 .tc-cay__nen { position: absolute; inset: 6% 8% 16%; border-radius: 50%; background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0) 68%); opacity: calc(0.4 + 0.6 * var(--than)); }
 
 /* ===== Chặng 3: ba nhóm lớp ===== */
@@ -75,10 +75,10 @@
 .tc-mau__o { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
 .tc-mau__o i { aspect-ratio: 1; border-radius: 6px; background: #f1eef7; border: 1px solid #e3dfeb; }
 .tc-mau__o i.xong { background: #8b77c2; border-color: #8b77c2; }
-.tc-mau__o i.dang { background: #fff; border: 2px solid #463665; }
+.tc-mau__o i.dang { background: #fff; border: 2px solid #2B1C47; }
 .tc-mau__thanh { height: 6px; border-radius: 3px; background: #efedf3; margin-top: 12px; overflow: hidden; }
-.tc-mau__thanh span { display: block; height: 100%; background: #463665; border-radius: 3px; }
-.tc-o--lon { grid-row: span 2; background: #463665; color: #fff; min-height: 560px; }
+.tc-mau__thanh span { display: block; height: 100%; background: #2B1C47; border-radius: 3px; }
+.tc-o--lon { grid-row: span 2; background: #2B1C47; color: #fff; min-height: 560px; }
 .tc-o--lon h3, .tc-o--lon .tc-o__nhan { color: #fff; }
 .tc-o--lon .tc-o__mo { color: #e4ddf3; }
 .tc-o__nhan { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; color: var(--dat); text-transform: uppercase; margin: 0 0 12px; }
@@ -87,7 +87,7 @@
 .tc-o__so { display: flex; gap: clamp(1rem, 3vw, 2.4rem); margin-top: auto; padding-top: 28px; flex-wrap: wrap; }
 .tc-o__so b { display: block; font-size: clamp(2rem, 1.4rem + 1.8vw, 3rem); line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .tc-o__so span { font-size: 0.92rem; color: #e4ddf3; }
-.tc-o__cay { position: absolute; right: -6%; bottom: -10%; width: 58%; aspect-ratio: 1632 / 1776; opacity: 0.16; }
+.tc-o__cay { position: absolute; right: -6%; bottom: -10%; width: 58%; aspect-ratio: 1; opacity: 0.16; }
 .tc-o__cay img { width: 100%; height: 100%; }
 
 /* ===== Chặng 4: hồ sơ ===== */
@@ -113,7 +113,7 @@
 .tc-chang__ngay { font-size: 0.95rem; font-weight: 600; color: var(--dat); font-variant-numeric: tabular-nums; }
 .tc-chang h3 { font-size: clamp(1.9rem, 1.5rem + 1.2vw, 2.5rem); line-height: 1.2; margin: 14px 0 12px; }
 .tc-chang p { margin: 0; color: var(--chu-phu); }
-.tc-chang--dich { background: #463665; border-color: #463665; }
+.tc-chang--dich { background: #2B1C47; border-color: #2B1C47; }
 .tc-chang--dich h3, .tc-chang--dich .tc-chang__ngay { color: #fff; }
 .tc-chang--dich p { color: #e4ddf3; }
 .tc-lt__cuoi { flex: 0 0 min(80vw, 360px); display: flex; align-items: center; padding-left: 1rem; color: var(--chu-phu); font-size: 1.05rem; }
@@ -130,7 +130,7 @@
 
 /* ===== Chặng 7: kết ===== */
 .tc-ket__san { height: 100vh; display: grid; place-items: center; text-align: center; padding-inline: var(--sc-gutter); }
-.tc-ket__cay { width: min(26vh, 220px); aspect-ratio: 1632 / 1776; margin: 0 auto 26px; position: relative; }
+.tc-ket__cay { width: min(26vh, 220px); aspect-ratio: 1; margin: 0 auto 26px; position: relative; }
 .tc-ket h2 { font-size: clamp(2.4rem, 1.4rem + 3.4vw, 4.4rem); line-height: 1.15; margin: 0 0 16px; text-wrap: balance; }
 .tc-ket .sc-body { margin: 0 auto 30px; }
 .tc-ket__nut { display: flex; gap: 22px; justify-content: center; align-items: center; flex-wrap: wrap; }
@@ -174,5 +174,5 @@
 
 /* Giảm chuyển động: hình cây hiện trọn, không cắt dần */
 @media (prefers-reduced-motion: reduce) {
-  .tc-cay .tc-cay__sach, .tc-cay .tc-cay__re, .tc-cay .tc-cay__than { clip-path: none; transform: none; }
+  .tc-cay .tc-cay__re, .tc-cay .tc-cay__than { clip-path: none; transform: none; }
 }

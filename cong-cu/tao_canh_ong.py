@@ -1,4 +1,5 @@
 """Dựng cảnh “Chú ong vun trí tuệ” cho phần mở đầu trang chủ.
+Cây dùng các lớp PNG của logo bản 3 (QĐ-024): chạy cong-cu/tach_lop_logo.py trước.
 
 Chạy: python3 cong-cu/tao_canh_ong.py
 Ra (web/public/hinh/):
@@ -29,12 +30,12 @@ RONG_23 = {"Các cô cùng ba mẹ": 202.7, "nắm lấy tay các con": 211.4, "
            "trên hành trình": 157.7, "vun bồi trí tuệ": 144.9, "và nội lực.": 107.1}
 
 BO_CUC = {
-    "ngang": dict(W=1200, H=660, CAY_W=360, TW=320, TH=280, CO=26, GIAN=50,
+    "ngang": dict(W=1200, H=660, CAY_W=380, TW=320, TH=280, CO=26, GIAN=50,
                   TRANG={"trai": (178, 392, -5), "phai": (1022, 378, 4)},
                   VAO=((-70, 120), (60, 130)), QUA=lambda W, CY: (W / 2, CY - 80),
                   RA=lambda W, N: ((W + 90, 40), (N[0] + 300, N[1] - 140)),
                   TOI_NGON=lambda N: (N[0] + 220, N[1] - 60)),
-    "doc": dict(W=640, H=880, CAY_W=400, TW=292, TH=250, CO=24, GIAN=46,
+    "doc": dict(W=640, H=880, CAY_W=430, TW=292, TH=250, CO=24, GIAN=46,
                 TRANG={"trai": (158, 186, -4), "phai": (482, 200, 4)},
                 VAO=((-70, 30), (40, 40)), QUA=lambda W, CY: (W / 2, 20),
                 RA=lambda W, N: ((W + 90, 60), (W - 20, N[1] - 180)),
@@ -43,9 +44,9 @@ BO_CUC = {
 
 def f(v): return ("%.1f" % v).rstrip("0").rstrip(".")
 
-def noi_dung(ten):
-    s = (LOP / ten).read_text()
-    return re.search(r"<svg[^>]*>(.*)</svg>", s, re.S).group(1)
+# Logo bản 3 (QĐ-024): các lớp PNG tách bằng cong-cu/tach_lop_logo.py, khung vuông LOGO x LOGO điểm ảnh gốc.
+LOGO = 1479
+LOP_CAY = ("lop-bia.png", "lop-re.png", "lop-tim.png")
 
 def xoay(cx, cy, goc, x, y):
     a = math.radians(goc)
@@ -54,15 +55,15 @@ def xoay(cx, cy, goc, x, y):
 def tao(ten_bo, TINH):
     B = BO_CUC[ten_bo]
     W, H, CAY_W, TW, TH, CO, GIAN, TRANG = (B[k] for k in ("W", "H", "CAY_W", "TW", "TH", "CO", "GIAN", "TRANG"))
-    CAY_H = CAY_W * 1776 / 1632
+    CAY_H = CAY_W
     CAY_X = (W - CAY_W) / 2
     CAY_Y = H - CAY_H - 6
-    def cay_diem(X, Y): return CAY_X + (X - 177) / 1632 * CAY_W, CAY_Y + (Y - 18) / 1776 * CAY_H
+    def cay_diem(X, Y): return CAY_X + X / LOGO * CAY_W, CAY_Y + Y / LOGO * CAY_H   # toạ độ trên ảnh logo gốc
     DONG_Y = [-GIAN, 0, GIAN]                 # đường chân chữ, tính từ tâm trang
     X0 = -TW / 2 + (TW - max(RONG_23[s] for s in THONG_DIEP["trai"] + THONG_DIEP["phai"]) * CO / 23) / 2
     # Ong viết bằng đầu đuôi: thân bay ngay phía trước nét chữ, không che chữ đã viết.
     DUOI_X, DUOI_Y = 46, -10
-    NGON = (W / 2 + 8, CAY_Y - 34)
+    NGON = (W / 2 + 8, CAY_Y + 84 / LOGO * CAY_H - 30)   # ngay trên đỉnh bộ não (hàng 84 của ảnh)
 
     # ---------- lịch: ong viết, bay, đậu ----------
     chang, lich_dong = [], []
@@ -112,7 +113,7 @@ def tao(ten_bo, TINH):
     khung_ong = [(0.0, 0.0)] + [(c[5], dai[i + 1] / dai[-1]) for i, c in enumerate(chang)] + [(CHU_KY, 1.0)]
 
     # giọt mật: từ chân mỗi trang xuống các điểm rễ
-    RE = [cay_diem(760, 1640), cay_diem(905, 1760), cay_diem(1000, 1790), cay_diem(1095, 1755), cay_diem(1240, 1640)]
+    RE = [cay_diem(459, 1290), cay_diem(588, 1353), cay_diem(742, 1378), cay_diem(888, 1353), cay_diem(1017, 1290)]   # điểm nằm trên rễ thật
     giot = []
     for trang, dich in (("trai", RE[:3]), ("phai", RE[2:])):
         cx, cy, g = TRANG[trang]
@@ -131,7 +132,7 @@ def tao(ten_bo, TINH):
     @keyframes o-vo { from { transform: scaleY(1); } to { transform: scaleY(0.45); } }
     .o-than { animation: o-nhun 0.6s ease-in-out infinite alternate; }
     @keyframes o-nhun { from { transform: translateY(0); } to { transform: translateY(-4px); } }
-    .o-chu { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-weight: 600; fill: #463665; }
+    .o-chu { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-weight: 600; fill: #2B1C47; }
     """ + ("" if not TINH else ".o-canh, .o-than { animation: none; }")
 
     svg = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" aria-hidden="true" focusable="false">',
@@ -156,8 +157,8 @@ def tao(ten_bo, TINH):
     svg += ["</defs>", "<style>" + css + "</style>"]
 
     # ánh sáng sau ngọn cây và dưới rễ
-    nx, ny = cay_diem(1000, 600)
-    rx_, ry_ = cay_diem(1000, 1690)
+    nx, ny = cay_diem(734, 420)     # tâm bộ não
+    rx_, ry_ = cay_diem(740, 1290)  # giữa vùng rễ
     if TINH:
         svg.append(f'<ellipse cx="{f(nx)}" cy="{f(ny)}" rx="{f(CAY_W * .55)}" ry="{f(CAY_W * .5)}" fill="url(#o-gn)" opacity=".45"/>')
         svg.append(f'<ellipse cx="{f(rx_)}" cy="{f(ry_)}" rx="{f(CAY_W * .48)}" ry="46" fill="url(#o-gm)" opacity=".35"/>')
@@ -181,17 +182,19 @@ def tao(ten_bo, TINH):
             svg.append(f'<text x="{f(X0)}" y="{DONG_Y[k]}" clip-path="url(#o-k-{trang}-{k})">{s}</text>')
         svg.append("</g></g>")
 
-    # cây trí tuệ (ba lớp đã duyệt), rồi lớp vàng rực dâng theo dòng mật
-    tf = f'translate({f(CAY_X)} {f(CAY_Y)}) scale({CAY_W / 1632:.5f}) translate(-177 -18)'
-    svg.append(f'<g transform="{tf}">' + "".join(noi_dung(t) for t in ("lop-trang.svg", "lop-nau.svg", "lop-tim.svg")) + "</g>")
+    # cây trí tuệ: các lớp PNG của logo bản 3, rồi lớp vàng rực dâng theo dòng mật
+    khung = f'x="{f(CAY_X)}" y="{f(CAY_Y)}" width="{f(CAY_W)}" height="{f(CAY_H)}"'
+    svg.append("".join(f'<image href="/hinh/{t}" {khung} preserveAspectRatio="xMidYMid meet"/>' for t in LOP_CAY))
     if not TINH:
-        vang = "".join(re.sub(r'fill="#[0-9A-Fa-f]{6}"', 'fill="url(#o-vang)"', noi_dung(t)) for t in ("lop-nau.svg", "lop-tim.svg"))
+        # Lớp vàng: một khối màu vàng, chỉ hiện ở chỗ có bìa, rễ, thân và não (mặt nạ là bóng trắng lop-bong.png).
+        svg.insert(svg.index("</defs>"), f'<mask id="o-mv" maskUnits="userSpaceOnUse" x="{f(CAY_X)}" y="{f(CAY_Y)}" width="{f(CAY_W)}" height="{f(CAY_H)}">'
+                   f'<image href="/hinh/lop-bong.png" {khung} preserveAspectRatio="xMidYMid meet"/></mask>')
         svg.append(f'<g clip-path="url(#o-dang)" opacity="0">'
                    + lap("opacity", [0, 0, 1, 1, .92, 1, 0, 0], [0, t_dang, t_dang + 0.05, t_den + 0.6, t_den + 1.0, t_ruc, t_mo1, CHU_KY])
-                   + f'<g transform="{tf}" filter="url(#o-hao)">{vang}</g></g>')
+                   + f'<g filter="url(#o-hao)"><rect {khung} fill="url(#o-vang)" mask="url(#o-mv)"/></g></g>')
         # hạt sáng dẫn đầu dòng mật, chạy dọc thân từ rễ lên tán
-        x_re, y_re = cay_diem(1000, 1700)
-        x_ngon, y_ngon = cay_diem(1000, 700)
+        x_re, y_re = cay_diem(740, 1250)
+        x_ngon, y_ngon = cay_diem(737, 520)
         dmat = f"M{f(x_re)} {f(y_re)} L{f(x_ngon)} {f(y_ngon)}"
         svg.append(f'<g opacity="0"><animateMotion dur="{f(CHU_KY)}s" repeatCount="indefinite" path="{dmat}" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;{q(t_dang)};{q(t_den)};1"/>'
                    + lap("opacity", [0, 0, 1, 1, 0, 0], [0, t_dang - 0.01, t_dang + 0.1, t_den - 0.1, t_den + 0.3, CHU_KY])
@@ -214,14 +217,14 @@ def tao(ten_bo, TINH):
                '<g class="o-canh"><ellipse cx="-6" cy="-20" rx="11" ry="16" fill="#ffffff" fill-opacity=".85" stroke="#8B77C2" stroke-width="1.6" transform="rotate(-18 -6 -20)"/></g>'
                '<g class="o-canh"><ellipse cx="7" cy="-21" rx="10" ry="15" fill="#ffffff" fill-opacity=".9" stroke="#8B77C2" stroke-width="1.6" transform="rotate(16 7 -21)"/></g>'
                '<clipPath id="o-tg"><ellipse cx="0" cy="0" rx="22" ry="15.5"/></clipPath>'
-               '<ellipse cx="0" cy="0" rx="22" ry="15.5" fill="#F2BD3E" stroke="#463665" stroke-width="2.2"/>'
-               '<g clip-path="url(#o-tg)" fill="#463665"><rect x="-9" y="-20" width="6.5" height="40"/><rect x="4" y="-20" width="6.5" height="40"/></g>'
-               '<path d="M-22 0 L-30 -3 L-30 3 Z" fill="#463665"/>'
-               '<circle cx="23" cy="-3" r="10.5" fill="#463665"/>'
+               '<ellipse cx="0" cy="0" rx="22" ry="15.5" fill="#F2BD3E" stroke="#2B1C47" stroke-width="2.2"/>'
+               '<g clip-path="url(#o-tg)" fill="#2B1C47"><rect x="-9" y="-20" width="6.5" height="40"/><rect x="4" y="-20" width="6.5" height="40"/></g>'
+               '<path d="M-22 0 L-30 -3 L-30 3 Z" fill="#2B1C47"/>'
+               '<circle cx="23" cy="-3" r="10.5" fill="#2B1C47"/>'
                '<circle cx="27" cy="-6" r="3.2" fill="#ffffff"/><circle cx="27.8" cy="-6.2" r="1.5" fill="#1f1b2b"/>'
                '<path d="M24 1.5 Q27.5 5 31 1.8" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>'
-               '<path d="M21 -12 Q19 -24 13 -27" fill="none" stroke="#463665" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="-27" r="2.6" fill="#463665"/>'
-               '<path d="M27 -11 Q29 -23 35 -26" fill="none" stroke="#463665" stroke-width="2" stroke-linecap="round"/><circle cx="35" cy="-26" r="2.6" fill="#463665"/>'
+               '<path d="M21 -12 Q19 -24 13 -27" fill="none" stroke="#2B1C47" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="-27" r="2.6" fill="#2B1C47"/>'
+               '<path d="M27 -11 Q29 -23 35 -26" fill="none" stroke="#2B1C47" stroke-width="2" stroke-linecap="round"/><circle cx="35" cy="-26" r="2.6" fill="#2B1C47"/>'
                "</g></g></g>")
     svg.append("</svg>")
     ten = "canh-ong" + ("-doc" if ten_bo == "doc" else "") + ("-tinh" if TINH else "") + ".svg"
