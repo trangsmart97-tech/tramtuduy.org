@@ -1,4 +1,5 @@
-// Máy chủ thử: phát trang luyende và đóng vai Supabase (chỉ phần /rest/v1/rpc/ld_*), dữ liệu trong PGlite.
+// Máy chủ thử: phát trang luyende (hoặc luyennghe) và đóng vai Supabase (chỉ phần /rest/v1/rpc/ld_*, ln_*), dữ liệu trong PGlite.
+// Đáp án bài nghe: nạp mọi tệp supabase/.temp/dang-nghe-*.sql (do dang_bai_nghe.mjs viết) có sẵn lúc khởi động.
 import { PGlite } from "@electric-sql/pglite";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 import http from "http"; import fs from "fs"; import path from "path";
@@ -40,18 +41,20 @@ const maDe = /^[a-z0-9-]+$/.test(de.ma || "") ? de.ma : "de-mau";
 await db.query(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, ma_phong, noi_dung) values ($4,$1,'dau_vao', now() - interval '5 min', now() + make_interval(mins => $3), '1234', $2)`, [de.tieuDe, de, Number(process.argv[9] || process.env.PHUT_DONG || 120), maDe]);
 await db.query(`insert into public.dap_an_de values ($1, $2)`, [maDe, da]);
 console.log("ma de: " + maDe);
+const temp = path.join(REPO, "supabase/.temp");
+if (fs.existsSync(temp)) for (const f of fs.readdirSync(temp).filter(f => /^dang-nghe-.*\.sql$/.test(f))) { await db.exec(fs.readFileSync(path.join(temp, f), "utf8")); console.log("nạp bài nghe " + f); }
 await db.exec(`insert into public.ma_thi (hoc_sinh_id, ma) select id, 'thu0an0000000000000000000001' from public.hoc_sinh where ma_hs = 'MAU-02';
                insert into public.ma_thi (hoc_sinh_id, ma) select id, 'thu0binh00000000000000000002' from public.hoc_sinh where ma_hs = 'MAU-03';
                set role anon;`);
 // Một cô thử (quản trị) để thử trang Luyện đề trên cổng: mọi lần gọi ld_co_* đóng vai cô này. Chỉ có trên máy thử.
 await db.exec(`reset role; insert into public.nhan_su (email, ho_ten, vai, quan_tri) values ('co.thu@vi-du.test', 'Cô thử', 'giang_day', true); set role anon;`);
-const KIEU = { p_tra_loi: "jsonb", p_su_kien: "jsonb", p_phan: "int", p_id: "uuid", p_diem: "numeric", p_hoc_sinh: "uuid", p_doi: "boolean" };
+const KIEU = { p_tra_loi: "jsonb", p_su_kien: "jsonb", p_phan: "int", p_id: "uuid", p_diem: "numeric", p_hoc_sinh: "uuid", p_doi: "boolean", p_lan_nghe: "int" };
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Methods": "POST, GET, OPTIONS" };
 let hang = Promise.resolve();
 http.createServer((q, a) => {
   const u = q.url.split("?")[0];
   if (q.method === "OPTIONS") { a.writeHead(204, CORS); return a.end(); }
-  if (q.method === "POST" && u.startsWith("/rest/v1/rpc/ld_")) {
+  if (q.method === "POST" && /^\/rest\/v1\/rpc\/l[dn]_/.test(u)) {
     let than = ""; q.on("data", c => than += c); q.on("end", () => { hang = hang.then(async () => {
       const ham = u.slice(13).replace(/[^a-z_]/g, ""), d = JSON.parse(than || "{}"), ts = [], gt = [];
       for (const [k, v] of Object.entries(d)) { gt.push(typeof v === "object" && v !== null ? JSON.stringify(v) : v); ts.push(`${k.replace(/[^a-z_]/g, "")} => $${gt.length}::${KIEU[k] || "text"}`); }
@@ -67,5 +70,6 @@ http.createServer((q, a) => {
   if (u === "/cau-hinh.js") { a.writeHead(200, { "Content-Type": "text/javascript" }); return a.end(`var CAU_HINH = { supabase: "", khoaCongKhai: "thu" };`); }
   const tep = path.join(WEB, u === "/" ? "index.html" : u);
   if (!tep.startsWith(WEB) || !fs.existsSync(tep)) { a.writeHead(404); return a.end(); }
-  a.writeHead(200, { "Content-Type": tep.endsWith(".html") ? "text/html; charset=utf-8" : "text/plain; charset=utf-8" }); a.end(fs.readFileSync(tep));
+  const KIEU_TEP = { html: "text/html; charset=utf-8", json: "application/json; charset=utf-8", js: "text/javascript", png: "image/png", mp3: "audio/mpeg", mp4: "video/mp4", wav: "audio/wav", m4a: "audio/mp4" };
+  a.writeHead(200, { "Content-Type": KIEU_TEP[tep.split(".").pop()] || "text/plain; charset=utf-8" }); a.end(fs.readFileSync(tep));
 }).listen(CONG, () => console.log("san sang " + CONG));

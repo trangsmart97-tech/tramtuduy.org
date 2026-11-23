@@ -147,7 +147,11 @@ kiem((await mot(`select nop_muon from public.luot_thi where hoc_sinh_id=$1`, [hs
 
 console.log("6. Hàm chấm SQL khớp hàm chấm cũ (chamBai) trên 500 bộ trả lời ngẫu nhiên");
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(path.join(process.env.HOME, "Desktop/luyende/kho-kin/Code.gs"), "utf8"), ctx);
+// Mã chấm cũ (Apps Script) để so khớp; cô đã chuyển thư mục cũ vào "KỶ NIỆM GIẢNG DẠY".
+const codeGs = [process.env.CODE_GS, "Desktop/KỶ NIỆM GIẢNG DẠY/luyende/kho-kin/Code.gs", "Desktop/luyende.tramtuduy.org/kho-kin/Code.gs", "Desktop/luyende/kho-kin/Code.gs"]
+  .filter(Boolean).map((x) => path.isAbsolute(x) ? x : path.join(process.env.HOME, x)).find((x) => fs.existsSync(x));
+if (!codeGs) throw new Error("Không tìm thấy kho-kin/Code.gs (đặt CODE_GS=đường dẫn)");
+vm.runInContext(fs.readFileSync(codeGs, "utf8"), ctx);
 const mau = { tn1: [0, 1, 2, 3, "", null], tn2: [0, 1, 2, 3], tn3: [1, "1", 3], tn4: [2, 0, ""], tl1: ["two books", "Two books!", "two  books ", "three books", "", "two books is the answer here"],
   tl2: ["She visited her grandparents last weekend.", "she visit her grandparents", "", "  "], tl3: ["29", " 29.", "28", "", "29 "], tl4: ["", "abc"] };
 let lech = 0;
@@ -353,6 +357,62 @@ for (const [w, a] of [["07 ĐỀ THI VÀ MỐC/NHÁP/ĐỀ ĐẦU VÀO/de-dau-va
     const loi = (await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [{ ...JSON.parse(fs.readFileSync(w, "utf8")), xaoPhuongAn: true }, JSON.parse(fs.readFileSync(a, "utf8"))])).map(r => r.l);
     console.log(`  tang3-tuan-1-toan-1.json nếu bật xáo: ${loi.length} lỗi`); loi.slice(0, 2).forEach(l => console.log("    - " + l.slice(0, 120)));
   }
+}
+
+console.log("10. Luyện nghe vào hồ sơ (QĐ-032)");
+{
+  await vaiGoc();
+  const nhanDT = { loai: "dien", diem: 1, nhom: "Tiếng Anh", chuDe: "TA21", kyNang: "KN09", bloom: "Hiểu", toiDaTu: 4 };
+  const nhanTN = { loai: "chon", diem: 1, nhom: "Tiếng Anh", chuDe: "TA22", kyNang: "KN03", bloom: "Hiểu" };
+  const daN = { tieuDe: "Thông báo ở trường", tuan: 1, banChepLoi: "Good morning, everyone.\nPlease bring two bottles of water.",
+    cau: { dt1: { ...nhanDT, dapAn: ["two bottles of water"], kyNangNghe: "nghe số lượng", doan: [3, 8], giaiThich: "Câu thứ hai." },
+           dt2: { ...nhanDT, dapAn: ["at half past three", "at 3.30"], kyNangNghe: "nghe giờ", doan: [8, 12] },
+           tn1: { ...nhanTN, dung: 2, kyNangNghe: "hiểu ý chính", giaiThich: "Cả bài nói về chuyến đi." } } };
+  let l = (await mot(`select noi_bo.ln_kiem_bai($1) l`, [daN])).map(r => r.l);
+  kiem(l.length === 0, "tệp đáp án bài nghe đủ nhãn thì không lỗi", l);
+  const hongN = JSON.parse(JSON.stringify(daN)); hongN.banChepLoi = ""; hongN.cau.dt1.toiDaTu = 5; hongN.cau.dt2.chuDe = "XX01"; hongN.cau.tn1.nhom = "Toán";
+  l = (await mot(`select noi_bo.ln_kiem_bai($1) l`, [hongN])).map(r => r.l);
+  kiem(l.length === 4 && l.some(x => /chép lời/.test(x)) && l.some(x => /toiDaTu/.test(x)) && l.some(x => /XX01/.test(x)) && l.some(x => /Tiếng Anh/.test(x)),
+    "bắt thiếu bản chép lời, toiDaTu khác 4, mã chủ đề sai, nhóm môn khác", l);
+  await mot(`insert into public.dap_an_nghe (ma_bai, noi_dung) values ('tuan-01-bai-1', $1)`, [daN]);
+  const MA = (await mot(`select m.ma from public.ma_thi m join public.hoc_sinh h on h.id=m.hoc_sinh_id where h.dang_hoc and h.id=$1`, [hsAn]))[0]?.ma;
+  kiem(!!MA, "học sinh An còn mã riêng");
+
+  await vaiKhach();
+  kiem((await mot(`select count(*)::int n from public.dap_an_nghe`))[0].n === 0, "khách không đọc thẳng được đáp án bài nghe");
+  r = await goi("ln_vao", "sai-ma"); kiem(/Đường dẫn chưa đúng\. Bạn/.test(r.loi || ""), "mã sai bị chặn, lời gọi “bạn”", r);
+  r = await goi("ln_vao", MA); kiem(r.kq && r.kq.ten === "An" && Object.keys(r.kq.daLam).length === 0, "chào đúng tên, chưa làm bài nào", r);
+  r = await goi("ln_cham", "tuan-09-bai-9", {}); kiem(/Chưa có bài nghe/.test(r.loi || ""), "bài chưa có thì báo", r);
+  const truocCham = (await (async () => { await vaiGoc(); const n = (await mot(`select count(*)::int n from public.bai_lam where loai='nghe'`))[0].n; await vaiKhach(); return n; })());
+  r = await goi("ln_cham", "tuan-01-bai-1", { dt1: " Two Bottles of water.", dt2: "at half past three in the afternoon", tn1: 2 });
+  kiem(r.kq && r.kq.diem == 2 && r.kq.toiDa == 3 && r.kq.vaoHoSo === false, "chấm không mã: 2/3, câu quá 4 từ bị tính sai", r);
+  kiem(r.kq && r.kq.chiTiet.dt2.chapNhan.length === 2 && r.kq.chiTiet.dt1.doan[0] === 3 && /bottles/.test(r.kq.banChepLoi), "trả về mọi cách viết, đoạn bản ghi, bản chép lời", r.kq && r.kq.chiTiet);
+  await vaiGoc();
+  kiem((await mot(`select count(*)::int n from public.bai_lam where loai='nghe'`))[0].n === truocCham, "chấm không mã thì không ghi hồ sơ");
+  await vaiKhach();
+  r = await goi("ln_nop", MA, "tuan-01-bai-1", { dt1: "two bottles of water", dt2: "at 3.30", tn1: "1" }, 2);
+  kiem(r.kq && r.kq.diem == 2 && r.kq.lan === 1 && r.kq.vaoHoSo === true, "nộp có mã: 2/3, lần 1", r);
+  await vaiGoc();
+  const bl = await mot(`select b.*, (select count(*)::int from public.cau_tra_loi c where c.bai_lam_id=b.id and c.nhom_mon='Tiếng Anh' and c.ma_chu_de is not null and c.ma_ky_nang is not null and c.bloom is not null) du_nhan
+    from public.bai_lam b where loai='nghe' and hoc_sinh_id=$1`, [hsAn]);
+  kiem(bl.length === 1 && bl[0].do_tin_cay === 2 && bl[0].tuan === 1 && bl[0].du_nhan === 3 && /lần 1/.test(bl[0].ten_bai) && /Nghe 2 lần/.test(bl[0].ghi_chu),
+    "hồ sơ có một bài nghe, độ tin cậy 2, tuần 1, ba câu đủ bốn nhãn", bl);
+  kiem((await mot(`select count(*)::int n from public.cau_tra_loi c join public.bai_lam b on b.id=c.bai_lam_id where b.loai='nghe' and c.ma_cau='tn1' and c.dung=false`))[0].n === 1, "câu chọn sai ghi dung = false");
+  await vaiKhach();
+  for (let i = 2; i <= 10; i++) await goi("ln_nop", MA, "tuan-01-bai-1", { dt1: "two bottles of water", dt2: "at 3.30", tn1: 2 }, 3);
+  r = await goi("ln_nop", MA, "tuan-01-bai-1", {}, 2); kiem(/10 lần/.test(r.loi || ""), "lần nộp thứ 11 trong 24 giờ bị chặn", r);
+  r = await goi("ln_vao", MA); kiem(r.kq && r.kq.daLam["tuan-01-bai-1"].lan === 10 && r.kq.daLam["tuan-01-bai-1"].diemCao == 3, "trang chào báo 10 lần, điểm cao nhất 3", r);
+  r = await goi("ln_cham", "tuan-01-bai-1", { x: "a".repeat(6000) }); kiem(/dài quá/.test(r.loi || ""), "bài làm quá dài bị chặn", r);
+  let loiQuyen = ""; try { await mot(`select noi_bo.ln_tra_ve('{}'::jsonb, '{}'::jsonb)`); } catch (e) { loiQuyen = e.message; }
+  kiem(/permission|quyền/i.test(loiQuyen), "khách không gọi được hàm nội bộ", loiQuyen);
+  await vaiGoc();
+  await mot(`delete from public.bai_lam where loai='nghe'`);
+  // QĐ-029: không còn lời nào gọi học sinh là “con” trong các hàm trang thi và trang nghe.
+  const conCon = (await mot(`select p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname in ('public','noi_bo') and (p.proname like 'ld\\_%' or p.proname like 'ln\\_%') and p.prosrc ~ '''[^'']*\\mCon\\M[^'']*'''`)).map(x => x.proname);
+  kiem(conCon.length === 0, "lời báo trong hàm ld_*, ln_* không còn “Con”", conCon);
+  r = await mot(`select public.ld_tep('x','y','z')`).then(() => "", (e) => e.message);
+  kiem(/Bạn xin cô/.test(r), "lời báo của trang thi đã đổi sang “bạn”", r);
 }
 
 console.log(`\nKết quả: ${soDat} đạt, ${soLoi} sai.`);
