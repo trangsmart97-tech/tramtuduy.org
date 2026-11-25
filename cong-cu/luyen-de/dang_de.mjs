@@ -9,7 +9,7 @@
 // Công cụ làm bốn việc, chưa đưa gì lên mạng:
 //   1. Chỉ nhận tệp nằm trong "08 CHỜ ĐĂNG WEB/" (luật 5 của bản chốt). Muốn thử tệp nháp thì thêm --thu.
 //   2. Kiểm đề bằng đúng hàm noi_bo.ld_kiem_de trên Postgres cục bộ (lược đồ và danh mục của kho này). Có lỗi thì dừng.
-//   3. Kiểm đủ tệp hình và bản ghi.
+//   3. Kiểm đủ tệp hình và bản ghi; hình phải rõ trên điện thoại (SVG có viewBox, PNG rộng từ 800 điểm ảnh, ≤ 1 MB).
 //   4. Viết một tệp SQL vào supabase/.temp/ (thư mục không vào git, vì tệp chứa đáp án). Tệp SQL tự kiểm đề lần nữa
 //      trên máy chủ và huỷ cả lần đăng nếu có lỗi; đề đã có lượt thi thì không cho ghi đè.
 // Đưa lên thật: chạy lệnh in ra ở cuối (supabase db query), chỉ khi cô Trang đã cho phép.
@@ -47,12 +47,21 @@ const phutAnh = Number((de.phan || []).slice(-1)[0]?.phutNopAnh) || 0;
 if (dong <= mo) dung("--dong phải sau --mo.");
 const tongPhut = (de.phan || []).reduce((s, p) => s + Number(p.phut || 0), 0) + phutAnh;
 if ((Date.parse(dong) - Date.parse(mo)) / 60000 < tongPhut) console.warn(`LƯU Ý: khoảng mở đề ngắn hơn tổng thời gian các phần (${tongPhut} phút).`);
-const loai = thamSo.loai || (ma === "dau-vao" ? "dau_vao" : /^moc-/.test(ma) ? "moc" : /^thuc-chien/.test(ma) ? "thuc_chien" : /^tang3-/.test(ma) ? "tang3" : "de");
+const loai = thamSo.loai || (ma === "dau-vao" ? "dau_vao" : /^moc-/.test(ma) ? "moc" : /^thuc-chien/.test(ma) ? "thuc_chien" : /^tang3-/.test(ma) ? "tang3" : /^bai-viet-/.test(ma) ? "bai_viet" : "de");
 // Đề có giám sát (đầu vào, Mốc, Thực chiến) không xáo phương án: cô chữa bài theo chữ cái, bản giấy phải khớp bản web
 // (tầng 5 lần 2, đề đầu vào, việc 12). Công cụ không bao giờ tự bật xáo; tệp đề tự bật thì dừng, trừ khi cô đã cho phép.
 if (de.xaoPhuongAn && ["dau_vao", "moc", "thuc_chien"].includes(loai) && !thamSo["co-cho-xao"])
   dung(`đề ${ma} (loại ${loai}) đang bật xaoPhuongAn. Đề có giám sát giữ nguyên thứ tự phương án. Chỉ thêm --co-cho-xao khi cô Trang đã quyết khác.`);
-const doTinCay = Number(thamSo["do-tin-cay"] || (loai === "tang3" ? 2 : 1));
+const doTinCay = Number(thamSo["do-tin-cay"] || (loai === "tang3" ? 2 : loai === "bai_viet" ? 3 : 1));
+// Bài viết ở nhà (QĐ-048): bạn gõ hoặc nộp ảnh bài viết tay, nên đề phải có câu "tuluan"; "soAnhToiDa" từ 1 đến 10.
+{
+  const moiCau = (de.phan || []).flatMap((p) => p.muc || []);
+  if (loai === "bai_viet" && !moiCau.some((m) => m.loai === "tuluan")) dung(`đề bài viết ${ma} chưa có câu "tuluan" (ô gõ bài và ô nộp ảnh).`);
+  for (const m of moiCau) if (m.soAnhToiDa !== undefined) {
+    if (m.loai !== "tuluan") dung(`câu ${m.id}: "soAnhToiDa" chỉ dùng cho câu "tuluan".`);
+    if (!Number.isInteger(m.soAnhToiDa) || m.soAnhToiDa < 1 || m.soAnhToiDa > 10) dung(`câu ${m.id}: "soAnhToiDa" phải là số nguyên từ 1 đến 10.`);
+  }
+}
 const tuan = thamSo.tuan !== undefined ? Number(thamSo.tuan) : (Number((ma.match(/tuan-(\d+)/) || [])[1]) || null);
 
 // Bài đọc hiện lại sau giờ thi: với đề có giám sát, người đăng phải xem danh sách và ghi --da-xem-bai-doc mới đăng được,
@@ -79,7 +88,26 @@ if (loi.length) { console.error(`Đề ${ma} có ${loi.length} lỗi:`); loi.for
 // 3. Tệp hình và bản ghi
 const LOAI_TEP = { ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".mp3": "audio/mpeg", ".m4a": "audio/mp4", ".wav": "audio/wav", ".ogg": "audio/ogg" };
 const tenTep = new Set();
-for (const p of de.phan) for (const m of p.muc) for (const k of ["hinh", "audio"]) if (m[k]) tenTep.add(m[k]);
+for (const p of de.phan) for (const m of p.muc) for (const k of ["hinh", "audio"]) if (m[k] !== undefined) {
+  if (typeof m[k] !== "string" || !m[k].trim()) dung(`câu ${m.id || "(khối bài đọc)"}: trường "${k}" phải là đường dẫn tệp, ví dụ "hinh/${ma}-c5.svg".`);
+  tenTep.add(m[k]);
+}
+const laHinh = (ten) => /\.(svg|png|jpe?g|webp)$/i.test(ten);
+// Hình phải rõ trên điện thoại (QĐ-048): SVG có viewBox để co giãn; PNG rộng từ 800 điểm ảnh; mỗi hình tối đa 1 MB.
+const kiemHinh = (ten, b) => {
+  if (b.length > 1_000_000) dung(`hình “${ten}” nặng ${Math.round(b.length / 1024)} KB, quá 1 MB: điện thoại tải chậm. Nén lại hoặc dùng SVG.`);
+  const duoi = path.extname(ten).toLowerCase();
+  if (duoi === ".svg") {
+    const s = b.toString("utf8");
+    if (!/<svg[\s\S]*?viewBox\s*=/i.test(s.slice(0, 2000))) dung(`hình “${ten}” thiếu viewBox: hình SVG không co giãn được trên điện thoại.`);
+    if (/<script|\son[a-z]+\s*=|<foreignObject|href\s*=\s*["']https?:/i.test(s)) dung(`hình “${ten}” có mã chạy, foreignObject hoặc liên kết ra ngoài. Hình SVG chỉ được có hình vẽ và chữ.`);
+  }
+  if (duoi === ".png") {
+    if (b.length < 24 || b.toString("latin1", 1, 4) !== "PNG") dung(`tệp “${ten}” không phải ảnh PNG.`);
+    const rong = b.readUInt32BE(16);
+    if (rong < 800) dung(`hình “${ten}” chỉ rộng ${rong} điểm ảnh: mờ trên điện thoại. Xuất lại PNG rộng từ 800 (nên 1200) điểm ảnh, hoặc dùng SVG.`);
+  }
+};
 const tep = [...tenTep].map((ten) => {
   const duongDan = path.resolve(path.dirname(tepDe), ten);
   if (!duongDan.startsWith(path.dirname(tepDe))) dung(`đường dẫn tệp “${ten}” ra ngoài thư mục đề.`);
@@ -88,6 +116,7 @@ const tep = [...tenTep].map((ten) => {
   if (!kieu) dung(`không nhận loại tệp “${ten}”.`);
   const b = fs.readFileSync(duongDan);
   if (b.length > 15_000_000) dung(`tệp “${ten}” lớn quá 15 MB.`);
+  if (laHinh(ten)) kiemHinh(ten, b);
   return { ten, kieu, b64: b.toString("base64"), co: b.length };
 });
 

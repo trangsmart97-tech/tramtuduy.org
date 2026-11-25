@@ -415,5 +415,96 @@ console.log("10. Luyện nghe vào hồ sơ (QĐ-032)");
   kiem(/Bạn xin cô/.test(r), "lời báo của trang thi đã đổi sang “bạn”", r);
 }
 
+console.log("11. Hình câu Tầng 3 và bài viết ở nhà nộp ảnh (QĐ-048)");
+{
+  await vaiGoc();
+  // 11a. Bài viết ở nhà: đề loại bai_viet, câu tuluan tối đa 2 ảnh; nộp vào hồ sơ như bài gõ.
+  const deV = { ma: "bai-viet-tuan-3-thu", tieuDe: "Bài viết ở nhà tuần 3 (thử)", phan: [
+    { ten: "Bài viết", phut: 60, muc: [{ loai: "tuluan", id: "v1", tenCau: "Đoạn văn", soAnhToiDa: 2, cau: "Viết đoạn văn." }, { loai: "chon", id: "c1", luaChon: ["a", "b"] }] }] };
+  const gocV = { nhom: "Tiếng Việt", chuDe: "TV02", kyNang: "KN01", bloom: "Sáng tạo" };
+  const daV = { cau: { v1: { ...gocV, loai: "tuluan", diem: 10 }, c1: { ...gocV, loai: "chon", dung: 0, diem: 1, bloom: "Hiểu" } } };
+  kiem((await mot(`select noi_bo.ld_kiem_de($1,$2) l`, [deV, daV])).length === 0, "đề bài viết có soAnhToiDa: không lỗi");
+  r = await mot(`insert into public.de_thi (ma, tieu_de, loai, do_tin_cay, tuan, mo, dong, noi_dung) values ($1, $2, 'bai_viet', 3, 3, now() - interval '1 hour', now() + interval '1 day', $3)`, [deV.ma, deV.tieuDe, deV]).then(() => "", (e) => e.message);
+  kiem(r === "", "bảng de_thi nhận loại bai_viet", r);
+  r = await mot(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, noi_dung) values ('x-loai', 'x', 'loai_la', now(), now() + interval '1 hour', '{}')`).then(() => "", (e) => e.message);
+  kiem(/check/i.test(r), "loại đề lạ vẫn bị chặn", r);
+  await mot(`insert into public.dap_an_de values ($1, $2)`, [deV.ma, daV]);
+  const MV = "thu0chi000000000000000000004", MV2 = "thu0dung00000000000000000005", ANH = "data:image/jpeg;base64,/9j/4AAQSkZJRg==";
+  await vaiKhach();
+  await goi("ld_bat_dau", MV, deV.ma, null); await goi("ld_bat_dau", MV2, deV.ma, null);
+  const a1 = await goi("ld_tai_anh", MV, deV.ma, "v1", ANH), a2 = await goi("ld_tai_anh", MV, deV.ma, "v1", ANH);
+  kiem(a1.kq?.id && a2.kq?.id, "gửi được 2 ảnh bài viết tay", [a1, a2]);
+  r = await goi("ld_tai_anh", MV, deV.ma, "v1", ANH); kiem(/tối đa 2 ảnh/.test(r.loi || ""), "ảnh thứ 3 bị chặn (soAnhToiDa 2)", r);
+  r = await goi("ld_tai_anh", MV, deV.ma, "c1", ANH); kiem(/không nhận ảnh/.test(r.loi || ""), "câu trắc nghiệm không nhận ảnh", r);
+  r = await goi("ld_tai_anh", MV, deV.ma, "khong-co", ANH); kiem(/không nhận ảnh/.test(r.loi || ""), "câu không có trong đề không nhận ảnh", r);
+  r = await goi("ld_tai_anh", MV2, deV.ma, "v1", "data:image/jpeg;base64," + Buffer.alloc(3000001, 1).toString("base64"));
+  kiem(/quá lớn/.test(r.loi || ""), "ảnh quá 3 MB bị chặn", r);
+  r = await goi("ld_xoa_anh", MV2, deV.ma, a1.kq.id); kiem(/Không tìm thấy ảnh/.test(r.loi || ""), "không xoá được ảnh của bạn khác", r);
+  r = await goi("ld_xoa_anh", MV, deV.ma, a1.kq.id); kiem(r.kq?.ok, "xoá được ảnh chụp hỏng của mình", r);
+  r = await goi("ld_tai_anh", MV, deV.ma, "v1", ANH); kiem(r.kq?.id, "xoá rồi gửi lại được", r);
+  r = await goi("ld_bat_dau", MV, deV.ma, null); kiem(r.kq?.anh?.v1?.length === 2, "vào lại thấy đúng 2 ảnh đã gửi", r.kq?.anh);
+  // Giới hạn 25 MB một lượt: chèn sẵn 24 MB rồi gửi thêm 2 MB.
+  await vaiGoc();
+  const luotV2 = (await mot(`select l.id from public.luot_thi l join public.ma_thi m on m.hoc_sinh_id = l.hoc_sinh_id where m.ma=$1 and l.ma_de=$2`, [MV2, deV.ma]))[0].id;
+  await mot(`insert into public.anh_nop (luot_thi_id, ma_cau, du_lieu) values ($1, 'v0', decode(repeat('00', 24000000), 'hex'))`, [luotV2]);
+  await vaiKhach();
+  r = await goi("ld_tai_anh", MV2, deV.ma, "v1", "data:image/jpeg;base64," + Buffer.alloc(2000000, 1).toString("base64"));
+  kiem(/quá 25 MB/.test(r.loi || ""), "tổng ảnh một lượt quá 25 MB bị chặn", r);
+  r = await goi("ld_nop", MV, deV.ma, { c1: 0 }, []);
+  kiem(r.kq && r.kq.soCauChoCham === 1, "nộp bài viết chỉ có ảnh: câu viết chờ cô chấm", r);
+  r = await goi("ld_xoa_anh", MV, deV.ma, a2.kq.id); kiem(/đã nộp/.test(r.loi || ""), "nộp rồi không xoá ảnh được", r);
+  await vaiGoc();
+  const bv = (await mot(`select b.loai, b.do_tin_cay, b.tuan, b.diem_toi_da::float d, (select count(*)::int from public.cham_tay t where t.bai_lam_id=b.id and t.ma_cau='v1' and t.diem is null) cho,
+      (select count(*)::int from public.anh_nop a join public.luot_thi l on l.id=a.luot_thi_id where l.bai_lam_id=b.id and a.ma_cau='v1') anh
+    from public.bai_lam b join public.luot_thi l on l.bai_lam_id=b.id where l.ma_de=$1`, [deV.ma]))[0];
+  kiem(bv && bv.loai === "bai_viet" && bv.do_tin_cay === 3 && bv.tuan === 3 && bv.d === 11 && bv.cho === 1 && bv.anh === 2,
+    "hồ sơ: bài loại bai_viet, độ tin cậy 3, tuần 3, câu viết chờ cô chấm, kèm 2 ảnh", bv);
+  const quyenXoa = (await mot(`select has_function_privilege('anon', 'public.ld_xoa_anh(text,text,uuid)', 'execute') a`))[0].a;
+  kiem(quyenXoa === true, "trang thi gọi được ld_xoa_anh");
+
+  // 11b. dang_de.mjs: hình Tầng 3 phải có tệp, rõ trên điện thoại; mã bai-viet- thành loại bai_viet.
+  const { execFileSync } = await import("child_process"); const os = await import("os");
+  const tam = fs.mkdtempSync(path.join(os.tmpdir(), "thu-hinh-")); fs.mkdirSync(path.join(tam, "hinh"));
+  const png = (rong) => { const b = Buffer.alloc(33); Buffer.from("89504e470d0a1a0a0000000d49484452", "hex").copy(b); b.writeUInt32BE(rong, 16); b.writeUInt32BE(300, 20); return b; };
+  fs.writeFileSync(path.join(tam, "hinh/c5.svg"), `<svg xmlns='http://www.w3.org/2000/svg' width='640' height='300' viewBox='0 0 640 300'><rect width='640' height='300' fill='white'/></svg>`);
+  fs.writeFileSync(path.join(tam, "hinh/c6.png"), png(1200));
+  const deH = { ma: "tang3-tuan-3-thu-hinh", tieuDe: "Thử hình", moDe: "2026-12-14T06:00:00+07:00", dongDe: "2026-12-20T22:00:00+07:00", phan: [{ ten: "Tầng 3", phut: 20, muc: [
+    { loai: "dien", id: "c5", cau: "Diện tích hình bên là ____ cm².", hinh: "hinh/c5.svg", moTaHinh: "Hình chữ nhật" },
+    { loai: "dien", id: "c6", cau: "Chu vi là ____ cm.", hinh: "hinh/c6.png" }] }] };
+  const gocH = { nhom: "Toán", chuDe: "TO04", kyNang: "KN01", bloom: "Vận dụng" };
+  const daH = { cau: { c5: { ...gocH, loai: "dien", dapAn: ["12"], diem: 1 }, c6: { ...gocH, loai: "dien", dapAn: ["14"], diem: 1 } } };
+  const chay = (d, a) => {
+    fs.writeFileSync(path.join(tam, d.ma + ".json"), JSON.stringify(d)); fs.writeFileSync(path.join(tam, d.ma + ".dapan.json"), JSON.stringify(a));
+    try { return { ra: execFileSync(process.execPath, [path.join(REPO, "cong-cu/luyen-de/dang_de.mjs"), "--de", path.join(tam, d.ma + ".json"), "--thu"], { encoding: "utf8", stdio: "pipe" }) }; }
+    catch (e) { return { loi: String(e.stderr || e.message) }; }
+  };
+  r = chay(deH, daH); kiem(/đạt kiểm/.test(r.ra || "") && /2 tệp hình/.test(r.ra || ""), "đề Tầng 3 có 2 hình (SVG, PNG 1200) đăng được, nhúng đủ 2 tệp", r);
+  const sqlH = path.join(REPO, "supabase/.temp/dang-de-" + deH.ma + ".sql");
+  kiem(fs.existsSync(sqlH) && /insert into public\.tep_de .*'hinh\/c5\.svg'/.test(fs.readFileSync(sqlH, "utf8")), "tệp SQL có hình vào bảng tep_de");
+  fs.rmSync(sqlH, { force: true });
+  const thieu = JSON.parse(JSON.stringify(deH)); thieu.phan[0].muc[1].hinh = "hinh/khong-co.png";
+  r = chay(thieu, daH); kiem(/thiếu tệp “hinh\/khong-co\.png”/.test(r.loi || ""), "thiếu tệp hình thì dừng", r);
+  fs.writeFileSync(path.join(tam, "hinh/c6.png"), png(500));
+  r = chay(deH, daH); kiem(/chỉ rộng 500 điểm ảnh/.test(r.loi || ""), "PNG hẹp dưới 800 điểm ảnh thì dừng", r);
+  fs.writeFileSync(path.join(tam, "hinh/c6.png"), png(1200));
+  fs.writeFileSync(path.join(tam, "hinh/c5.svg"), `<svg xmlns='http://www.w3.org/2000/svg' width='640' height='300'><rect width='640' height='300'/></svg>`);
+  r = chay(deH, daH); kiem(/thiếu viewBox/.test(r.loi || ""), "SVG thiếu viewBox thì dừng", r);
+  fs.writeFileSync(path.join(tam, "hinh/c5.svg"), `<svg viewBox='0 0 10 10' onload='alert(1)'></svg>`);
+  r = chay(deH, daH); kiem(/mã chạy/.test(r.loi || ""), "SVG có mã chạy thì dừng", r);
+  const deV2 = { ...deV, ma: "bai-viet-tuan-3-thu-2", moDe: deH.moDe, dongDe: deH.dongDe };
+  r = chay(deV2, daV); kiem(/loại bai_viet, độ tin cậy 3/.test(r.ra || ""), "mã bai-viet- đăng thành loại bai_viet, độ tin cậy 3", r);
+  fs.rmSync(path.join(REPO, "supabase/.temp/dang-de-" + deV2.ma + ".sql"), { force: true });
+  const deV3 = JSON.parse(JSON.stringify(deV2)); deV3.phan[0].muc[0].soAnhToiDa = 20;
+  r = chay(deV3, daV); kiem(/từ 1 đến 10/.test(r.loi || ""), "soAnhToiDa ngoài 1–10 thì dừng", r);
+  fs.rmSync(tam, { recursive: true, force: true });
+
+  // 11c. Trang thi: hình rộng hết khung, chạm để phóng to; ô ảnh có xoá, giới hạn số ảnh và 25 MB ảnh gốc.
+  const trang = fs.readFileSync(path.resolve(process.env.LUYENDE || path.join(DA, "..", "luyende.tramtuduy.org"), "thi.html"), "utf8");
+  for (const [mau, ten] of [[/img\.hinh \{[^}]*width:100%/, "hình rộng hết khung"], [/id="phong-to"/, "lớp phóng to hình"], [/moTaHinh/, "lời tả hình"],
+    [/xoaAnh: \["ld_xoa_anh", "id"\]/, "nút xoá ảnh gọi ld_xoa_anh"], [/soAnhToiDa/, "giới hạn số ảnh của câu"], [/25 \* 1024 \* 1024/, "giới hạn 25 MB ảnh gốc"],
+    [/if \(m\.hinh && kq\.de\)/, "hình câu hiện lại ở màn hình kết quả"]])
+    kiem(mau.test(trang), "thi.html: " + ten);
+}
+
 console.log(`\nKết quả: ${soDat} đạt, ${soLoi} sai.`);
 process.exit(soLoi ? 1 : 0);
