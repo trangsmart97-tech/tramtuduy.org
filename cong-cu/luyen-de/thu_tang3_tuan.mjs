@@ -36,8 +36,10 @@ for (const [i, f] of de.entries()) {
   // Mở đề ngay bây giờ (chỉ trên máy), giữ độ dài như thật
   await db.query(`update public.de_thi set dong = now() + (dong - mo), mo = now() - interval '1 min' where ma=$1`, [ma]);
   const vao = (await anon(`select public.ld_bat_dau($1,$2) r`, [mr, ma]))[0].r, chuVao = JSON.stringify(vao);
+  // Phương án của câu chọn khác có thể trùng chữ đáp án câu điền (vd. “72 m²”): không tính là lộ.
+  const phuongAn = new Set(d.phan.flatMap((p) => p.muc).flatMap((m) => m.luaChon || []).map((x) => JSON.stringify(x)));
   for (const [k, c] of Object.entries(da.cau)) {
-    for (const x of c.dapAn || []) if (x.length > 3) ok(!chuVao.includes(JSON.stringify(x)), `đáp án ${k} lộ khi vào đề`);
+    for (const x of c.dapAn || []) if (x.length > 3 && !phuongAn.has(JSON.stringify(x))) ok(!chuVao.includes(JSON.stringify(x)), `đáp án ${k} lộ khi vào đề`);
     ok(!/"dung"\s*:|"giaiThich"|"chapNhan"/.test(chuVao), "đề gửi về có trường đáp án");
     const goc = d.phan.flatMap((p) => p.muc).find((m) => m.id === k); ok(goc && goc.loai === c.loai, `câu ${k} lệch loại hoặc thiếu trong đề`);
   }
