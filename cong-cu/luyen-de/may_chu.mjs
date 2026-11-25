@@ -41,6 +41,14 @@ const maDe = /^[a-z0-9-]+$/.test(de.ma || "") ? de.ma : "de-mau";
 await db.query(`insert into public.de_thi (ma, tieu_de, loai, mo, dong, ma_phong, noi_dung) values ($4,$1,'dau_vao', now() - interval '5 min', now() + make_interval(mins => $3), '1234', $2)`, [de.tieuDe, de, Number(process.argv[9] || process.env.PHUT_DONG || 120), maDe]);
 await db.query(`insert into public.dap_an_de values ($1, $2)`, [maDe, da]);
 console.log("ma de: " + maDe);
+// Biến THU_MUC (tuỳ chọn): nạp thêm mọi đề trong thư mục ấy bằng đúng tệp SQL dang_de.mjs đã viết, mở ngay, đóng sau PHUT_DONG phút.
+if (process.env.THU_MUC) for (const f of fs.readdirSync(process.env.THU_MUC).filter(f => /^[a-z0-9-]+\.json$/.test(f))) {
+  const m = f.replace(/\.json$/, ""), sqlTep = path.join(REPO, `supabase/.temp/dang-de-${m}.sql`);
+  if (!fs.existsSync(sqlTep)) { console.log("chưa có tệp SQL cho " + m); continue; }
+  await db.exec(fs.readFileSync(sqlTep, "utf8"));
+  await db.query(`update public.de_thi set mo = now() - interval '1 min', dong = now() + make_interval(mins => $2) where ma = $1`, [m, Number(process.env.PHUT_DONG || 120)]);
+  console.log("nạp đề " + m);
+}
 const temp = path.join(REPO, "supabase/.temp");
 if (fs.existsSync(temp)) for (const f of fs.readdirSync(temp).filter(f => /^dang-nghe-.*\.sql$/.test(f))) { await db.exec(fs.readFileSync(path.join(temp, f), "utf8")); console.log("nạp bài nghe " + f); }
 await db.exec(`insert into public.ma_thi (hoc_sinh_id, ma) select id, 'thu0an0000000000000000000001' from public.hoc_sinh where ma_hs = 'MAU-02';

@@ -69,7 +69,9 @@ const congKhai = { ma, tieuDe: bai.tieuDe, tuan: bai.tuan, bac: bai.bac, giong: 
   cumTu: bai.cumTu || [] };
 const chuoiCK = JSON.stringify({ ...congKhai, viDu: null });  // câu ví dụ được phép hiện sẵn đáp án
 for (const k of Object.values(cau)) for (const d of [].concat(k.dapAn || [])) {
-  if (d && congKhai.dienTu.some((c) => JSON.stringify(c).toLowerCase().includes(String(d).toLowerCase()))) dung(`đáp án “${d}” còn nằm trong câu hỏi công khai.`);
+  // So theo từ trọn vẹn: “run” không trùng “runner”, nhưng “sensors” trong câu khác vẫn bị bắt.
+  const mau = new RegExp("(^|[^a-z0-9])" + String(d).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)");
+  if (d && congKhai.dienTu.some((c) => mau.test(String(c.cau).toLowerCase()))) dung(`đáp án “${d}” còn nằm trong câu hỏi công khai.`);
 }
 if (/banChepLoi|"dapAn"|"dung"|giaiThich/.test(chuoiCK)) dung("phần công khai còn dòng đáp án hoặc lời giải.");
 fs.writeFileSync(path.join(khoNghe, "bai", ma + ".json"), JSON.stringify(congKhai, null, 2) + "\n");
